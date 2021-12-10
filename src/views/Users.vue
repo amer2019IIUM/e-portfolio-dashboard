@@ -1,0 +1,43 @@
+<template>
+  <div class="team">
+    <h1 class="subheading grey--text text-center mb-5">Users</h1>
+    <hr class="mb-10" />
+    <v-container>
+      <v-layout row wrap>
+        <v-flex xs12 sm6 md4 lg3 v-for="person in team" :key="person.name">
+          <v-card class="text-center ma-3">
+            <v-responsive class="pt-4">
+              <v-avatar size="100" class="red lighten-2">
+                <img :src="person.avatar" alt="" />
+              </v-avatar>
+            </v-responsive>
+            <v-card-text>
+              <div class="subheading">{{ person.name }}</div>
+              <div class="grey--text">{{ person.role }}</div>
+            </v-card-text>
+            <v-btn outlined small class="mb-2" color="teal">
+              <span>View</span>
+            </v-btn>
+          </v-card>
+        </v-flex>
+      </v-layout>
+    </v-container>
+  </div>
+</template>
+
+<script>
+// @ is an alias to /src
+
+export default {
+  name: "team",
+  components: {},
+  data: () => ({
+    team: [
+      { name: "Iyad", role: "web developer", avatar: "/img1.png" },
+      { name: "Reda", role: "Graphic designer", avatar: "/img2.png" },
+      { name: "Zineb", role: "web developer", avatar: "/img3.png" },
+      { name: "Hu TechGroup", role: "Desktop developer", avatar: "/img4.png" },
+    ],
+  }),
+};
+</script>
