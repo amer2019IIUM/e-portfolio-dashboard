@@ -3,7 +3,7 @@ import VueRouter from 'vue-router'
 import Dashboard from '../views/Dashboard.vue'
 import Portfolios from '../views/Portfolios.vue'
 import Users from '../views/Users.vue'
-import CreatePortfolio from '../views/components/CreatePortfolio.vue'
+import CreatePortfolio from '../views/pages/CreatePortfolio.vue'
 
 Vue.use(VueRouter)
 

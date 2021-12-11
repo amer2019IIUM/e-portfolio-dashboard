@@ -45,7 +45,7 @@
         </v-flex>
         <v-flex class="mt-4 mb-4">
           <router-link to="create-portfolio" style="text-decoration: none;">
-            <v-btn outlined color="teal lighten-3" dark v-on="on">
+            <v-btn outlined color="teal lighten-3" dark>
               Add new project
             </v-btn>
           </router-link>
