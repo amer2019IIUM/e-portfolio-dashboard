@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Dashboard from '../views/Dashboard.vue'
 import Portfolios from '../views/Portfolios.vue'
 import Users from '../views/Users.vue'
+import CreatePortfolio from '../views/components/CreatePortfolio.vue'
 
 Vue.use(VueRouter)
 
@@ -25,6 +26,11 @@ const routes = [
     path: '/users',
     name: 'users',
     component: Users
+  },
+  {
+    path: '/create-portfolio',
+    name: 'create-portfolio',
+    component: CreatePortfolio
   }
 ]
 

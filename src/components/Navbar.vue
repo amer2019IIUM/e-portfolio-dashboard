@@ -44,7 +44,11 @@
           <p class="primaryColor subheading mt-1 text-center">Username</p>
         </v-flex>
         <v-flex class="mt-4 mb-4">
-          <Popup />
+          <router-link to="create-portfolio" style="text-decoration: none;">
+            <v-btn outlined color="teal lighten-3" dark v-on="on">
+              Add new project
+            </v-btn>
+          </router-link>
         </v-flex>
       </v-layout>
       <v-list flat>
@@ -67,7 +71,6 @@
   </nav>
 </template>
 <script>
-import Popup from "./Popup.vue";
 export default {
   data: () => ({
     drawer: true,
@@ -77,9 +80,7 @@ export default {
       { icon: "person", text: "Users", route: "/users" },
     ],
   }),
-  components: {
-    Popup,
-  },
+  components: {},
 };
 </script>
 <style scoped>
