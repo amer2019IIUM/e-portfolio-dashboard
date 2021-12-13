@@ -2,8 +2,8 @@
 const state = {
     homeSecData: null,
     aboutSecData: null,
-    skillSecData: null,
-    experienceSecData: null,
+    skillSecData: [],
+    experienceSecData: [],
     educationSecData: null,
     projectSecData: null,
     interestSecData: null,

@@ -52,6 +52,9 @@
         <v-alert dense outlined type="error" v-if="hasError('location')">
           <strong>Location</strong> is required!
         </v-alert>
+        <v-col cols="12" sm="6" md="4" class="mt-3">
+          <image-upload />
+        </v-col>
         <v-card
           class="d-flex justify-center mb-6"
           max-width="13000"
@@ -101,7 +104,7 @@
       </tab-content>
 
       <!-- SKILL SECTION -->
-      <tab-content title="SKILL SECTION">
+      <!-- <tab-content title="SKILL SECTION">
         <v-data-table
           :headers="headers"
           :items="formData.skillItems"
@@ -195,44 +198,16 @@
             </v-icon>
           </template>
         </v-data-table>
+      </tab-content> -->
+      <tab-content title="SKILL SECTION">
+        <skill-sec />
       </tab-content>
 
       <!-- EXPERIENCE SECTION -->
       <tab-content title="EXPERIENCE SECTION">
-        <div class="form-group">
-          <label for="companyName">Your Company Name</label>
-          <input
-            type="text"
-            class="form-control"
-            :class="hasError('companyName') ? 'is-invalid' : ''"
-            placeholder="Enter your Company / Organization name"
-            v-model="formData.companyName"
-          />
-          <div v-if="hasError('companyName')" class="invalid-feedback">
-            <div class="error" v-if="!$v.formData.companyName.required">
-              Please provide a valid company name.
-            </div>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="numberOfEmployees">Number of Employees</label>
-          <input
-            type="text"
-            class="form-control"
-            :class="hasError('numberOfEmployees') ? 'is-invalid' : ''"
-            placeholder="Enter Total Number of Employees"
-            v-model="formData.numberOfEmployees"
-          />
-          <div v-if="hasError('numberOfEmployees')" class="invalid-feedback">
-            <div class="error" v-if="!$v.formData.numberOfEmployees.required">
-              Please provide number of employees in your company.
-            </div>
-            <div class="error" v-if="!$v.formData.numberOfEmployees.numeric">
-              Should be a valid value.
-            </div>
-          </div>
-        </div>
+        <experience-sec />
       </tab-content>
+
       <tab-content title="EDUCATION SECTION">
         <div class="form-group">
           <label for="companyName">Your Company Name</label>
@@ -345,43 +320,26 @@ import { ValidationHelper } from "vue-step-wizard";
 import "vue-step-wizard/dist/vue-step-wizard.css";
 import { required } from "vuelidate/lib/validators";
 import { email } from "vuelidate/lib/validators";
-import { mapActions } from "vuex";
-// eslint-disable-next-line no-unused-vars
-import { numeric } from "vuelidate/lib/validators";
 
+// import { numeric } from "vuelidate/lib/validators";
+import ImageUpload from "../../components/ImageUpload.vue";
+import ExperienceSec from "../../components/portfolio-sections/ExperienceSec.vue";
+import SkillSec from "../../components/portfolio-sections/SkillSec.vue";
 export default {
   name: "Create-portfolio",
   mixins: [ValidationHelper],
 
-  components: {},
+  components: { ImageUpload, SkillSec, ExperienceSec },
 
   data() {
     return {
+      activePicker: "",
+      date: null,
+      menu: false,
+      experienceJoin: false,
       dialog: false,
       dialogDelete: false,
-      skillTypes: ["", "Techical", "Professional"],
-      headers: [
-        {
-          text: "Skill title",
-          align: "start",
-          sortable: false,
-          value: "title",
-        },
-        { text: "Type", sortable: false, value: "type" },
-        { text: "Skill's Percentage", value: "percentage" },
-        { text: "Actions", value: "actions", sortable: false },
-      ],
-      editedIndex: -1,
-      editedItem: {
-        title: "",
-        type: "",
-        percentage: 0,
-      },
-      defaultItem: {
-        title: "",
-        type: "",
-        percentage: 0,
-      },
+
       formData: {
         //Home Data
         firstName: "sd",
@@ -398,11 +356,6 @@ export default {
 
         ///about data
         summary: "sd",
-
-        ///skill data
-        skillItems: [],
-        hiddenResumeSkill: false,
-        hiddenPortfolioSkill: false,
 
         ///Education data
         degree: "sd",
@@ -471,65 +424,20 @@ export default {
     },
   },
   watch: {
-    dialog(val) {
-      val || this.close();
+    menu(val) {
+      val && setTimeout(() => (this.activePicker = "YEAR"));
     },
-    dialogDelete(val) {
-      val || this.closeDelete();
+    experienceJoin(val) {
+      val && setTimeout(() => (this.activePicker = "YEAR"));
     },
   },
-  created() {
-    this.initialize();
-  },
+  created() {},
   methods: {
-    initialize() {
-      this.formData.skillItems = [];
+    saveExperienceJoinDate(date) {
+      this.$refs.menu.save(date);
+      this.$refs.experienceJoin.save(date);
     },
 
-    editItem(item) {
-      this.editedIndex = this.formData.skillItems.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-      this.dialog = true;
-    },
-
-    deleteItem(item) {
-      this.editedIndex = this.formData.skillItems.indexOf(item);
-      this.editedItem = Object.assign({}, item);
-      this.dialogDelete = true;
-    },
-
-    deleteItemConfirm() {
-      this.formData.skillItems.splice(this.editedIndex, 1);
-      this.closeDelete();
-    },
-
-    close() {
-      this.dialog = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-
-    closeDelete() {
-      this.dialogDelete = false;
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
-        this.editedIndex = -1;
-      });
-    },
-
-    save() {
-      if (this.editedIndex > -1) {
-        Object.assign(
-          this.formData.skillItems[this.editedIndex],
-          this.editedItem
-        );
-      } else {
-        this.formData.skillItems.push(this.editedItem);
-      }
-      this.close();
-    },
     nextStep() {
       ///Set Home Data
       this.home = this.formData;
@@ -556,15 +464,15 @@ export default {
     onComplete() {
       alert("Submitting Form ! Rock On");
     },
-    ...mapActions({
-      home: "Portfolio/getHomeData",
-      about: "Portfolio/getAboutData",
-      skill: "Portfolio/getSkillData",
-      experience: "Portfolio/getExperienceData",
-      education: "Portfolio/getEducationData",
-      project: "Portfolio/getProjectData",
-      interest: "Portfolio/getInterestData",
-    }),
+    // ...mapActions({
+    //   home: "Portfolio/getHomeData",
+    //   about: "Portfolio/getAboutData",
+    //   skill: "Portfolio/getSkillData",
+    //   experience: "Portfolio/getExperienceData",
+    //   education: "Portfolio/getEducationData",
+    //   project: "Portfolio/getProjectData",
+    //   interest: "Portfolio/getInterestData",
+    // }),
   },
 };
 </script>

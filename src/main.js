@@ -10,6 +10,11 @@ import 'vue-step-wizard/dist/vue-step-wizard.css'
 Vue.use(VueStepWizard);
 Vue.config.productionTip = false
 
+///https://github.com/kartoteket/vue-image-upload-resize
+import ImageUploader from 'vue-image-upload-resize'
+Vue.use(ImageUploader);
+
+
 new Vue({
   store,
   router,
