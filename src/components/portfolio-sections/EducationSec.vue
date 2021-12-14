@@ -1,20 +1,20 @@
 <template>
   <div>
-    <!-- EXPERIENCE SECTION -->
+    <!-- EDUCATION SECTION -->
     <v-data-table
       :headers="headers"
-      :items="formData.experiencItems"
+      :items="formData.educationItems"
       class="elevation-1"
     >
       <template v-slot:top>
         <v-toolbar flat>
-          <v-toolbar-title>Experiences</v-toolbar-title>
+          <v-toolbar-title>Educations</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
           <v-dialog v-model="dialog" max-width="500px">
             <template v-slot:activator="{ on, attrs }">
               <v-btn color="teal" dark class="mb-2" v-bind="attrs" v-on="on">
-                New Experience
+                New EDUCATION
               </v-btn>
             </template>
             <v-card>
@@ -26,60 +26,61 @@
                   <v-row>
                     <v-col cols="12">
                       <v-text-field
-                        v-model="editedItem.jobTitle"
+                        v-model="editedItem.degree"
                         :counter="20"
-                        :rules="titleAndorgNameRules"
-                        label="Job Title"
+                        :rules="generalRequiredFieldsRules"
+                        label="Dgree"
                         required
                       >
                       </v-text-field>
                     </v-col>
                     <v-col cols="12">
                       <v-text-field
-                        v-model="editedItem.orgName"
-                        :rules="titleAndorgNameRules"
-                        label="Organization name"
+                        v-model="editedItem.cgpa"
+                        :rules="generalRequiredFieldsRules"
+                        label="CGPA"
                         required
                       >
                       </v-text-field>
-                    </v-col>
-                    <v-col cols="12">
-                      <v-combobox
-                        v-model="editedItem.coreDuties"
-                        :items="coreDutiesArray"
-                        chips
-                        clearable
-                        label="Enter Core Duties"
-                        multiple
-                        prepend-icon="mdi-filter-variant"
-                        solo
-                      >
-                        <template
-                          v-slot:selection="{ attrs, item, select, selected }"
-                        >
-                          <v-chip
-                            v-bind="attrs"
-                            :input-value="selected"
-                            close
-                            @click="select"
-                            @click:close="remove(item)"
-                          >
-                            <strong>{{ item }}</strong
-                            >&nbsp;
-                            <span>(interest)</span>
-                          </v-chip>
-                        </template>
-                      </v-combobox>
                     </v-col>
                     <v-col cols="12">
                       <v-text-field
-                        v-model="editedItem.futherDetails"
-                        :rules="coreDetaialsAndFutherDetailsRules"
-                        label="Futher Details"
+                        v-model="editedItem.educationHeadline"
+                        :rules="generalRequiredFieldsRules"
+                        label="Headline"
                         required
                       >
                       </v-text-field>
                     </v-col>
+
+                    <v-col cols="12">
+                      <v-text-field
+                        v-model="editedItem.school"
+                        :rules="generalRequiredFieldsRules"
+                        label="School"
+                        required
+                      >
+                      </v-text-field>
+                    </v-col>
+                    <v-col cols="12">
+                      <v-text-field
+                        v-model="editedItem.country"
+                        :rules="generalRequiredFieldsRules"
+                        label="Country"
+                        required
+                      >
+                      </v-text-field>
+                    </v-col>
+                    <v-col cols="12">
+                      <v-text-field
+                        v-model="editedItem.city"
+                        :rules="generalRequiredFieldsRules"
+                        label="city"
+                        required
+                      >
+                      </v-text-field>
+                    </v-col>
+
                     <v-col cols="12" lg="6">
                       <div>
                         <v-menu
@@ -92,8 +93,8 @@
                         >
                           <template v-slot:activator="{ on, attrs }">
                             <v-text-field
-                              v-model="editItem.joinDate"
-                              label="Join Date"
+                              v-model="editItem.startedAt"
+                              label="Started Date"
                               :rules="dateRules"
                               prepend-icon="mdi-calendar"
                               readonly
@@ -102,7 +103,7 @@
                             ></v-text-field>
                           </template>
                           <v-date-picker
-                            v-model="editItem.joinDate"
+                            v-model="editItem.startedAt"
                             :active-picker.sync="activePicker"
                             :max="
                               new Date(
@@ -113,7 +114,7 @@
                                 .substr(0, 10)
                             "
                             min="1950-01-01"
-                            @change="saveJoinDate"
+                            @change="saveStartedDate"
                           ></v-date-picker>
                         </v-menu>
                       </div>
@@ -130,8 +131,8 @@
                         >
                           <template v-slot:activator="{ on, attrs }">
                             <v-text-field
-                              v-model="editItem.quitDate"
-                              label="Quit Date"
+                              v-model="editItem.finishedAt"
+                              label="Finished Date"
                               prepend-icon="mdi-calendar"
                               readonly
                               v-bind="attrs"
@@ -139,7 +140,7 @@
                             ></v-text-field>
                           </template>
                           <v-date-picker
-                            v-model="editItem.quitDate"
+                            v-model="editItem.finishedAt"
                             :active-picker.sync="activePicker2"
                             :max="
                               new Date(
@@ -150,7 +151,7 @@
                                 .substr(0, 10)
                             "
                             min="1950-01-01"
-                            @change="saveQuitDate"
+                            @change="saveFinishedDate"
                           ></v-date-picker>
                         </v-menu>
                       </div>
@@ -222,10 +223,9 @@ export default {
       menu2: false,
 
       dateRules: [(v) => !!v || "Join Date is required"],
-      titleAndorgNameRules: [
-        (v) => !!v || "Field is required",
-        (v) =>
-          (v && v.length <= 10) || "Job Title must be less than 10 characters",
+      generalRequiredFieldsRules: [
+        (v) => !!v || "Field is required!",
+        (v) => (v && v.length <= 50) || "Field must be less than 10 characters",
       ],
       coreDetaialsAndFutherDetailsRules: [
         // (v) => !!v || "Job Title is required",
@@ -238,43 +238,53 @@ export default {
       skillTypes: ["", "Techical", "Professional"],
       headers: [
         {
-          text: "Job Title",
+          text: "Degree",
           align: "start",
           sortable: false,
-          value: "jobTitle",
+          value: "degree",
         },
         {
-          text: "Organization name",
+          text: "Started at",
           sortable: false,
-          value: "orgName",
+          value: "startedAt",
+        },
+        {
+          text: "Finished at",
+          sortable: false,
+          value: "finishedAt",
         },
 
-        { text: "Core Duties", value: "coreDuties" },
-        { text: "Futher Details", value: "futherDetails" },
-        { text: "Join Date", sortable: false, value: "joinDate" },
-        { text: "Quit Date", sortable: false, value: "quitDate" },
+        { text: "CGAP", value: "cgpa" },
+        { text: "Headline", value: "educationHeadline" },
+        { text: "School", value: "school" },
+        { text: "University Country", value: "country" },
+        { text: "City", value: "city" },
         { text: "Actions", value: "actions", sortable: false },
       ],
       editedIndex: -1,
       editedItem: {
-        jobTitle: "",
-        orgName: "",
-        coreDuties: "",
-        futherDetails: "",
-        joinDate: "",
-        quitDate: "",
+        degree: "",
+        startedAt: "",
+        finishedAt: "",
+        cgpa: "",
+        educationHeadline: "",
+        school: "",
+        country: "",
+        city: "",
       },
       defaultItem: {
-        jobTitle: "",
-        orgName: "",
-        coreDuties: "",
-        futherDetails: "",
-        joinDate: "",
-        quitDate: "",
+        degree: "",
+        startedAt: "",
+        finishedAt: "",
+        cgpa: "",
+        educationHeadline: "",
+        school: "",
+        country: "",
+        city: "",
       },
       formData: {
-        ///experience data
-        experiencItems: null,
+        ///EDUCATION data
+        educationItems: null,
         hiddenResumeSkill: false,
         hiddenPortfolioSkill: false,
       },
@@ -283,10 +293,10 @@ export default {
 
   computed: {
     formTitle() {
-      return this.editedIndex === -1 ? "New Experience" : "Edit Experience";
+      return this.editedIndex === -1 ? "New Education" : "Edit Education";
     },
     ...mapGetters({
-      experienceSecData: "Portfolio/experienceSecData",
+      educationSecData: "Portfolio/educationSecData",
     }),
   },
 
@@ -319,14 +329,14 @@ export default {
       );
       this.editedItem.coreDuties = [...this.editedItem.coreDuties];
     },
-    saveJoinDate(date) {
+    saveStartedDate(date) {
       this.$refs.menu.save(date);
     },
-    saveQuitDate(date) {
+    saveFinishedDate(date) {
       this.$refs.menu2.save(date);
     },
     initialize() {
-      this.formData.experiencItems = this.experienceSecData;
+      this.formData.educationItems = this.educationSecData;
     },
     reset() {
       this.$refs.form.reset();
@@ -335,20 +345,20 @@ export default {
       this.$refs.form.resetValidation();
     },
     editItem(item) {
-      this.editedIndex = this.formData.experiencItems.indexOf(item);
+      this.editedIndex = this.formData.educationItems.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
 
     deleteItem(item) {
-      this.editedIndex = this.formData.experiencItems.indexOf(item);
+      this.editedIndex = this.formData.educationItems.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
     },
 
     deleteItemConfirm() {
-      this.formData.experiencItems.splice(this.editedIndex, 1);
-      this.experience(this.formData.experiencItems);
+      this.formData.educationItems.splice(this.editedIndex, 1);
+      this.education(this.formData.educationItems);
       this.closeDelete();
     },
 
@@ -370,24 +380,24 @@ export default {
 
     save() {
       if (this.$refs.form.validate()) {
-        // eslint-disable-next-line no-console
-        console.log(this.formData.experiencItems);
-        // if (this.editedIndex > -1) {
-        //   Object.assign(
-        //     this.formData.experiencItems[this.editedIndex],
-        //     this.editedItem
-        //   );
-        //   this.experience(this.formData.experiencItems);
-        // } else {
-        //   this.formData.experiencItems.push(this.editedItem);
-        //   this.experience(this.formData.experiencItems);
-        // }
+        if (this.editedIndex > -1) {
+          Object.assign(
+            this.formData.educationItems[this.editedIndex],
+            this.editedItem
+          );
+          this.education(this.formData.educationItems);
+        } else {
+          this.formData.educationItems.push(this.editedItem);
+          this.education(this.formData.educationItems);
+          // eslint-disable-next-line no-console
+          console.log(this.education);
+        }
         this.close();
       }
     },
 
     ...mapActions({
-      experience: "Portfolio/getExperienceData",
+      education: "Portfolio/getEducationData",
     }),
   },
 };

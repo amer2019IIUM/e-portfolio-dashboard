@@ -4,9 +4,9 @@ const state = {
     aboutSecData: null,
     skillSecData: [],
     experienceSecData: [],
-    educationSecData: null,
-    projectSecData: null,
-    interestSecData: null,
+    educationSecData: [],
+    projectSecData: [],
+    interestSecData: [],
 };
 
 const getters = {

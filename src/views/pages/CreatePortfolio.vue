@@ -102,103 +102,6 @@
           <strong>Summary</strong> is required!
         </v-alert>
       </tab-content>
-
-      <!-- SKILL SECTION -->
-      <!-- <tab-content title="SKILL SECTION">
-        <v-data-table
-          :headers="headers"
-          :items="formData.skillItems"
-          class="elevation-1"
-        >
-          <template v-slot:top>
-            <v-toolbar flat>
-              <v-toolbar-title>Skills</v-toolbar-title>
-              <v-divider class="mx-4" inset vertical></v-divider>
-              <v-spacer></v-spacer>
-              <v-dialog v-model="dialog" max-width="500px">
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    color="teal"
-                    dark
-                    class="mb-2"
-                    v-bind="attrs"
-                    v-on="on"
-                  >
-                    New Item
-                  </v-btn>
-                </template>
-                <v-card>
-                  <v-card-title>
-                    <span class="text-h5">{{ formTitle }}</span>
-                  </v-card-title>
-
-                  <v-card-text>
-                    <v-container>
-                      <v-row>
-                        <v-col cols="12" sm="6" md="4">
-                          <v-text-field
-                            v-model="editedItem.title"
-                            label="Skill Title"
-                          ></v-text-field>
-                        </v-col>
-                        <v-col cols="12" sm="6" md="4" class="mt-3">
-                          <v-select
-                            :items="skillTypes"
-                            label="Type"
-                            dense
-                            v-model="editedItem.type"
-                          ></v-select>
-                        </v-col>
-                        <v-col cols="12" sm="6" md="4">
-                          <v-text-field
-                            v-model="editedItem.percentage"
-                            label="Percentage"
-                          ></v-text-field>
-                        </v-col>
-                      </v-row>
-                    </v-container>
-                  </v-card-text>
-
-                  <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" text @click="close">
-                      Cancel
-                    </v-btn>
-                    <v-btn color="blue darken-1" text @click="save">
-                      Save
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
-              <v-dialog v-model="dialogDelete" max-width="500px">
-                <v-card>
-                  <v-card-title class="text-h5"
-                    >Are you sure you want to delete this item?</v-card-title
-                  >
-                  <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="blue darken-1" text @click="closeDelete"
-                      >Cancel</v-btn
-                    >
-                    <v-btn color="blue darken-1" text @click="deleteItemConfirm"
-                      >OK</v-btn
-                    >
-                    <v-spacer></v-spacer>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
-            </v-toolbar>
-          </template>
-          <template v-slot:item.actions="{ item }">
-            <v-icon small class="mr-2" @click="editItem(item)">
-              mdi-pencil
-            </v-icon>
-            <v-icon small @click="deleteItem(item)">
-              mdi-delete
-            </v-icon>
-          </template>
-        </v-data-table>
-      </tab-content> -->
       <tab-content title="SKILL SECTION">
         <skill-sec />
       </tab-content>
@@ -208,109 +111,19 @@
         <experience-sec />
       </tab-content>
 
+      <!-- EDUCATION SECTION -->
       <tab-content title="EDUCATION SECTION">
-        <div class="form-group">
-          <label for="companyName">Your Company Name</label>
-          <input
-            type="text"
-            class="form-control"
-            :class="hasError('companyName') ? 'is-invalid' : ''"
-            placeholder="Enter your Company / Organization name"
-            v-model="formData.companyName"
-          />
-          <div v-if="hasError('companyName')" class="invalid-feedback">
-            <div class="error" v-if="!$v.formData.companyName.required">
-              Please provide a valid company name.
-            </div>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="numberOfEmployees">Number of Employees</label>
-          <input
-            type="text"
-            class="form-control"
-            :class="hasError('numberOfEmployees') ? 'is-invalid' : ''"
-            placeholder="Enter Total Number of Employees"
-            v-model="formData.numberOfEmployees"
-          />
-          <div v-if="hasError('numberOfEmployees')" class="invalid-feedback">
-            <div class="error" v-if="!$v.formData.numberOfEmployees.required">
-              Please provide number of employees in your company.
-            </div>
-            <div class="error" v-if="!$v.formData.numberOfEmployees.numeric">
-              Should be a valid value.
-            </div>
-          </div>
-        </div>
+        <education-sec />
       </tab-content>
+
+      <!-- INTEREST SECTION -->
       <tab-content title="PROJECT SECTION">
-        <div class="form-group">
-          <label for="companyName">Your Company Name</label>
-          <input
-            type="text"
-            class="form-control"
-            :class="hasError('companyName') ? 'is-invalid' : ''"
-            placeholder="Enter your Company / Organization name"
-            v-model="formData.companyName"
-          />
-          <div v-if="hasError('companyName')" class="invalid-feedback">
-            <div class="error" v-if="!$v.formData.companyName.required">
-              Please provide a valid company name.
-            </div>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="numberOfEmployees">Number of Employees</label>
-          <input
-            type="text"
-            class="form-control"
-            :class="hasError('numberOfEmployees') ? 'is-invalid' : ''"
-            placeholder="Enter Total Number of Employees"
-            v-model="formData.numberOfEmployees"
-          />
-          <div v-if="hasError('numberOfEmployees')" class="invalid-feedback">
-            <div class="error" v-if="!$v.formData.numberOfEmployees.required">
-              Please provide number of employees in your company.
-            </div>
-            <div class="error" v-if="!$v.formData.numberOfEmployees.numeric">
-              Should be a valid value.
-            </div>
-          </div>
-        </div>
+        <project-sec />
       </tab-content>
+
+      <!-- INTEREST SECTION -->
       <tab-content title="INTEREST SECTION">
-        <div class="form-group">
-          <label for="referral">From Where did you hear about us</label>
-          <select
-            :class="hasError('referral') ? 'is-invalid' : ''"
-            class="form-control"
-            v-model="formData.referral"
-          >
-            <option>Newspaper</option>
-            <option>Online Ad</option>
-            <option>Friend</option>
-            <option>Other</option>
-          </select>
-          <div v-if="hasError('referral')" class="invalid-feedback">
-            <div class="error" v-if="!$v.formData.referral.required">
-              Please select on of the fields.
-            </div>
-          </div>
-        </div>
-        <div class="form-group form-check">
-          <input
-            type="checkbox"
-            :class="hasError('terms') ? 'is-invalid' : ''"
-            class="form-check-input"
-            v-model="formData.terms"
-          />
-          <label class="form-check-label">I accpet terms & conditions</label>
-          <div v-if="hasError('terms')" class="invalid-feedback">
-            <div class="error" v-if="!$v.formData.terms.required">
-              Please select terms and conditions.
-            </div>
-          </div>
-        </div>
+        <interest-sec />
       </tab-content>
     </form-wizard>
   </div>
@@ -325,11 +138,21 @@ import { email } from "vuelidate/lib/validators";
 import ImageUpload from "../../components/ImageUpload.vue";
 import ExperienceSec from "../../components/portfolio-sections/ExperienceSec.vue";
 import SkillSec from "../../components/portfolio-sections/SkillSec.vue";
+import EducationSec from "../../components/portfolio-sections/EducationSec.vue";
+import InterestSec from "../../components/portfolio-sections/InterestSec.vue";
+import ProjectSec from "../../components/portfolio-sections/ProjectSec.vue";
 export default {
   name: "Create-portfolio",
   mixins: [ValidationHelper],
 
-  components: { ImageUpload, SkillSec, ExperienceSec },
+  components: {
+    ImageUpload,
+    SkillSec,
+    ExperienceSec,
+    EducationSec,
+    InterestSec,
+    ProjectSec,
+  },
 
   data() {
     return {
