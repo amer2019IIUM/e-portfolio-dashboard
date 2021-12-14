@@ -62,14 +62,7 @@
                       >
                       </v-text-field>
                     </v-col>
-                    <v-col cols="12">
-                      <v-text-field
-                        v-model="editedItem.projectScreenshots"
-                        label="Screenshots"
-                        required
-                      >
-                      </v-text-field>
-                    </v-col>
+
                     <v-col cols="12">
                       <v-combobox
                         v-model="editedItem.technologies"
@@ -97,6 +90,19 @@
                           </v-chip>
                         </template>
                       </v-combobox>
+                    </v-col>
+                    <v-col cols="12" class="text-center">
+                      <label for="" style="color:#666666"
+                        >Upload some Screenshots for this project</label
+                      >
+                    </v-col>
+
+                    <v-col
+                      cols="12"
+                      class=""
+                      style="display: flex; justify-content: center;"
+                    >
+                      <project-images />
                     </v-col>
                     <v-col cols="12">
                       <v-btn color="blue darken-1" text @click="close">
@@ -152,8 +158,10 @@
 <script>
 import { mapGetters } from "vuex";
 import { mapActions } from "vuex";
+import ProjectImages from "../helper components/ProjectImages.vue";
 
 export default {
+  components: { ProjectImages },
   data() {
     return {
       technologiesArray: [],
