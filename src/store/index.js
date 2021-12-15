@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import Portfolio from './modules/portfolio.js'
+import Attachment from './modules/attachment.js'
 Vue.use(Vuex);
 
 // const debug = process.env.NODE_ENV !== 'production'
@@ -13,7 +14,7 @@ export default new Vuex.Store({
     mutations: {},
     actions: {},
     modules: {
-        Portfolio
+        Portfolio, Attachment
     },
     // strict: debug,
 })

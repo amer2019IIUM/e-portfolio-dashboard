@@ -1,0 +1,27 @@
+mutation(
+  $userId: ID!
+  $title: String!
+  $desc: String!
+  $used_technologies: [String]
+  $progress: Int!
+  $source_code: String
+  $attachment: [CreateAttachmentHasManyInputs]
+  $deletedAttachment: [CreateAttachmentHasManyInputs]
+) {
+  createProject(
+    id: 1
+    input: {
+      title: $title
+      lang: "En"
+      desc: $desc
+      used_technologies: $used_technologies
+      progress: $progress
+      source_code: $source_code
+      icon: "String"
+      user: { connect: $userId }
+      attachments: { create: $attachment, delete: $deletedAttachment }
+    }
+  ) {
+    id
+  }
+}

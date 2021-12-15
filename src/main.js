@@ -12,6 +12,8 @@ Vue.config.productionTip = false
 
 ///https://github.com/kartoteket/vue-image-upload-resize
 import ImageUploader from 'vue-image-upload-resize'
+
+import { createProvider } from './vue-apollo'
 Vue.use(ImageUploader);
 
 
@@ -19,5 +21,6 @@ new Vue({
   store,
   router,
   vuetify,
+  apolloProvider: createProvider(),
   render: h => h(App)
 }).$mount('#app')

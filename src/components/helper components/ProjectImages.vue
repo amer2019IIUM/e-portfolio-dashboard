@@ -18,39 +18,55 @@
 
 <script>
 import VueUploadMultipleImage from "vue-upload-multiple-image";
+import { mapGetters, mapActions } from "vuex";
+
 export default {
   name: "app",
   data() {
     return {
       images: [],
+      fileList: [],
     };
   },
   components: {
     VueUploadMultipleImage,
   },
+  computed: {
+    ...mapGetters({
+      projectPhotosData: "Attachment/projectPhotos",
+    }),
+  },
+  created() {
+    this.initialize();
+  },
   methods: {
+    initialize() {
+      // eslint-disable-next-line
+      console.log(this.projectPhotosData);
+      this.fileList = this.projectPhotosData;
+    },
+    // eslint-disable-next-line
     uploadImageSuccess(formData, index, fileList) {
       // eslint-disable-next-line no-console
-      console.log("data", formData, index, fileList);
-      // Upload image api
-      // axios.post('http://your-url-upload', formData).then(response => {
-      //   console.log(response)
-      // })
+      this.projectPhotos(fileList);
     },
     beforeRemove(index, done, fileList) {
       // eslint-disable-next-line no-console
       console.log("index", index, fileList);
       var r = confirm("remove image");
       if (r == true) {
+        this.projectPhotos(fileList);
         done();
       } else {
         // eslint-disable-next-line no-console
       }
     },
     editImage(formData, index, fileList) {
-      // eslint-disable-next-line no-console
-      console.log("edit data", formData, index, fileList);
+      this.projectPhotos(fileList);
     },
+    ...mapActions({
+      projectPhotos: "Attachment/getProjectPhotos",
+    }),
   },
 };
 </script>

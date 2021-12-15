@@ -156,10 +156,9 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
-import { mapActions } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 import ProjectImages from "../helper components/ProjectImages.vue";
-
+import CreateProject from "../../graphql/mutations/create/CreateProject.gql";
 export default {
   components: { ProjectImages },
   data() {
@@ -224,7 +223,7 @@ export default {
         projectProgress: "",
         projectSourceCode: "",
         projectScreenshots: "",
-        technologies: "",
+        technologies: [],
       },
       defaultItem: {
         projectTitle: "",
@@ -249,6 +248,7 @@ export default {
     },
     ...mapGetters({
       projectSecData: "Portfolio/projectSecData",
+      projectPhotos: "Attachment/projectPhotos",
     }),
   },
 
@@ -274,6 +274,8 @@ export default {
     },
 
     initialize() {
+      // eslint-disable-next-line no-console
+      console.log(this.projectSecData[this.projectSecData.length - 1]);
       this.formData.projectItems = this.projectSecData;
     },
     reset() {
@@ -317,20 +319,64 @@ export default {
     },
 
     save() {
-      if (this.$refs.form.validate()) {
-        // eslint-disable-next-line no-console
-        console.log(this.formData.projectItems);
-        if (this.editedIndex > -1) {
-          Object.assign(
-            this.formData.projectItems[this.editedIndex],
-            this.editedItem
-          );
-          this.project(this.formData.projectItems);
-        } else {
-          this.formData.projectItems.push(this.editedItem);
+      if (this.editedIndex > -1) {
+        Object.assign(
+          this.formData.projectItems[this.editedIndex],
+          this.editedItem
+        );
+        this.project(this.formData.projectItems);
+      } else {
+        this.formData.projectItems.push(this.editedItem);
+        if (this.$refs.form.validate()) {
+          var photos = [];
+          for (let index = 0; index < this.projectPhotos.length; index++) {
+            let photo = new Object();
+            photo.title = this.projectPhotos[index].name;
+            photo.link = this.projectPhotos[index].path;
+            photo.type = "PHOTO";
+
+            photos[index] = photo;
+          }
+          // eslint-disable-next-line
+          console.log(photos);
+          if (photos.length == 0) {
+            this.alert = true; // eslint-disable-next-line
+            console.log("Photos should not be not");
+          } else {
+            this.$apollo
+              .mutate({
+                // Query
+                mutation: CreateProject,
+                // Parameters
+                variables: {
+                  userId: 1,
+                  title: this.projectSecData[this.projectSecData.length - 1]
+                    .projectTitle,
+                  desc: this.projectSecData[this.projectSecData.length - 1]
+                    .projectDesc,
+                  used_technologies: this.projectSecData[
+                    this.projectSecData.length - 1
+                  ].technologies,
+                  progress: parseInt(
+                    this.projectSecData[this.projectSecData.length - 1]
+                      .projectProgress
+                  ),
+                  source_code: "github.com",
+                  attachment: photos,
+                },
+              })
+              .then((data) => {
+                //eslint-disable-next-line no-console
+                console.log(data);
+                this.close();
+              })
+              .catch((errors) => {
+                //eslint-disable-next-line no-console
+                console.log(errors);
+              });
+          }
           this.project(this.formData.projectItems);
         }
-        this.close();
       }
     },
 
