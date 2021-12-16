@@ -1,0 +1,14 @@
+mutation($userId: ID!, $title: String!) {
+  createInterest(
+    input: {
+      lang: "En"
+      title: $title
+      sort: 1
+      hidden_portfolio: true
+      hidden_resume: false
+      user: { connect: $userId }
+    }
+  ) {
+    id
+  }
+}

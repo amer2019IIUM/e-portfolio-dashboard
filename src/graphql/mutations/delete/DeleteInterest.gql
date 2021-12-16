@@ -1,0 +1,5 @@
+mutation($interestId: ID!) {
+  deleteInterest(id: $interestId) {
+    id
+  }
+}

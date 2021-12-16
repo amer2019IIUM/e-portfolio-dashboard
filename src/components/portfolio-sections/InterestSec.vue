@@ -26,7 +26,7 @@
                   <v-row>
                     <v-col cols="12">
                       <v-text-field
-                        v-model="editedItem.interestTitle"
+                        v-model="editedItem.title"
                         :counter="30"
                         :rules="titleFieldsRules"
                         label="Interest Title"
@@ -34,16 +34,16 @@
                       >
                       </v-text-field>
                     </v-col>
-                    <v-col cols="12">
+                    <!-- <v-col cols="12">
                       <v-textarea
-                        v-model="editedItem.interestDesc"
+                        v-model="editedItem.desc"
                         :counter="250"
                         :rules="descFieldsRules"
                         label="Interest Description"
                         required
                       >
                       </v-textarea>
-                    </v-col>
+                    </v-col> -->
 
                     <v-col cols="12">
                       <v-btn color="blue darken-1" text @click="close">
@@ -53,7 +53,7 @@
                         :disabled="!valid"
                         color="success"
                         class="mr-4"
-                        @click="save"
+                        @click="save(editedItem.id)"
                       >
                         Save
                       </v-btn>
@@ -75,7 +75,10 @@
                 <v-btn color="blue darken-1" text @click="closeDelete"
                   >Cancel</v-btn
                 >
-                <v-btn color="blue darken-1" text @click="deleteItemConfirm"
+                <v-btn
+                  color="blue darken-1"
+                  text
+                  @click="deleteItemConfirm(editedItem.id)"
                   >OK</v-btn
                 >
                 <v-spacer></v-spacer>
@@ -97,7 +100,10 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
+import { mapGetters } from "vuex";
+import CreateInterest from "../../graphql/mutations/create/CreateInterest.gql";
+import UpdateInterest from "../../graphql/mutations/update/UpdateInterest.gql";
+import DeleteInterest from "../../graphql/mutations/delete/DeleteInterest.gql";
 
 export default {
   data() {
@@ -126,23 +132,25 @@ export default {
           text: "Interest Title",
           align: "start",
           sortable: false,
-          value: "interestTitle",
+          value: "title",
         },
-        {
-          text: "Interest Description",
-          sortable: false,
-          value: "interestDesc",
-        },
+        // {
+        //   text: "Interest Description",
+        //   sortable: false,
+        //   value: "desc",
+        // },
         { text: "Actions", value: "actions", sortable: false },
       ],
       editedIndex: -1,
       editedItem: {
-        interestTitle: "",
-        interestDesc: "",
+        id: "",
+        title: "",
+        // desc: "",
       },
       defaultItem: {
-        interestTitle: "",
-        interestDesc: "",
+        id: "",
+        title: "",
+        // desc: "",
       },
       formData: {
         ///Interest data
@@ -196,10 +204,26 @@ export default {
       this.dialogDelete = true;
     },
 
-    deleteItemConfirm() {
-      this.formData.interestItems.splice(this.editedIndex, 1);
-      this.interest(this.formData.interestItems);
-      this.closeDelete();
+    deleteItemConfirm(id) {
+      this.$apollo
+        .mutate({
+          // Query
+          mutation: DeleteInterest,
+
+          // Parameters
+          variables: {
+            interestId: id,
+            title: this.editedItem.title,
+          },
+        })
+        .then(() => {
+          this.formData.interestItems.splice(this.editedIndex, 1);
+          this.closeDelete();
+        })
+        .catch((errors) => {
+          //eslint-disable-next-line no-console
+          console.log(errors);
+        });
     },
 
     close() {
@@ -218,27 +242,56 @@ export default {
       });
     },
 
-    save() {
+    save(id) {
       if (this.$refs.form.validate()) {
+        //eslint-disable-next-line no-console
+        console.log("HI");
         if (this.editedIndex > -1) {
-          Object.assign(
-            this.formData.interestItems[this.editedIndex],
-            this.editedItem
-          );
-          this.interest(this.formData.interestItems);
+          this.$apollo
+            .mutate({
+              // Query
+              mutation: UpdateInterest,
+
+              // Parameters
+              variables: {
+                interestId: id,
+                title: this.editedItem.title,
+              },
+            })
+            .then(() => {
+              Object.assign(
+                this.formData.interestItems[this.editedIndex],
+                this.editedItem
+              );
+              this.close();
+            })
+            .catch((errors) => {
+              //eslint-disable-next-line no-console
+              console.log(errors);
+            });
         } else {
-          this.formData.interestItems.push(this.editedItem);
-          this.interest(this.formData.interestItems);
-          // eslint-disable-next-line no-console
-          console.log(this.interest);
+          this.$apollo
+            .mutate({
+              // Query
+              mutation: CreateInterest,
+
+              // Parameters
+              variables: {
+                userId: 1,
+                title: this.editedItem.title,
+              },
+            })
+            .then(() => {
+              this.formData.interestItems.push(this.editedItem);
+              this.close();
+            })
+            .catch((errors) => {
+              //eslint-disable-next-line no-console
+              console.log(errors);
+            });
         }
-        this.close();
       }
     },
-
-    ...mapActions({
-      interest: "Portfolio/getInterestData",
-    }),
   },
 };
 </script>

@@ -277,7 +277,8 @@ export default {
               },
             })
             .then(() => {
-              this.formData.skillItems.push(this.editedItem);
+              // this.formData.skillItems.push(this.editedItem);
+              this.initialize();
               this.close();
             })
             .catch((errors) => {

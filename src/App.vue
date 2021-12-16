@@ -28,6 +28,9 @@ export default {
     ...mapActions({
       projects: "Portfolio/getProjectData",
       skills: "Portfolio/getSkillData",
+      interests: "Portfolio/getInterestData",
+      educations: "Portfolio/getEducationData",
+      experiences: "Portfolio/getExperienceData",
     }),
   },
   apollo: {
@@ -39,8 +42,17 @@ export default {
         ///SET THE DATA OF THE PROJECT
         this.projects(data.user.projects.data);
 
-        ///SET THE DATA OF THE PROJECT
+        ///SET THE DATA OF THE SKILL
         this.skills(data.user.skills.data);
+
+        ///SET THE DATA OF THE INTEREST
+        this.interests(data.user.interests.data);
+
+        ///SET THE DATA OF THE EDUCATION
+        this.educations(data.user.educations.data);
+
+        ///SET THE DATA OF THE EXPERIENCE
+        this.experiences(data.user.experiences.data);
         return data;
       },
     },

@@ -1,0 +1,5 @@
+mutation($interestId: ID!, $title: String!) {
+  updateInterest(id: $interestId, input: { title: $title }) {
+    id
+  }
+}
