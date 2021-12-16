@@ -1,0 +1,5 @@
+mutation($skillId: ID!) {
+  deleteSkill(id: $skillId) {
+    id
+  }
+}

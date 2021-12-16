@@ -60,7 +60,7 @@
                   <v-btn
                     color="blue darken-1"
                     text
-                    @click="save"
+                    @click="save(editedItem.id)"
                     :disabled="!valid"
                   >
                     Save
@@ -79,7 +79,10 @@
                 <v-btn color="blue darken-1" text @click="closeDelete"
                   >Cancel</v-btn
                 >
-                <v-btn color="blue darken-1" text @click="deleteItemConfirm"
+                <v-btn
+                  color="blue darken-1"
+                  text
+                  @click="deleteItemConfirm(editedItem.id)"
                   >OK</v-btn
                 >
                 <v-spacer></v-spacer>
@@ -101,8 +104,10 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
-
+import { mapGetters } from "vuex";
+import CreateSkill from "../../graphql/mutations/create/CreateSkill.gql";
+import UpdateSkill from "../../graphql/mutations/update/UpdateSkill.gql";
+import DeleteSkill from "../../graphql/mutations/delete/DeleteSkill.gql";
 export default {
   data() {
     return {
@@ -135,11 +140,13 @@ export default {
       ],
       editedIndex: -1,
       editedItem: {
+        id: "",
         title: "",
         type: "",
         percentage: 0,
       },
       defaultItem: {
+        id: "",
         title: "",
         type: "",
         percentage: 0,
@@ -191,10 +198,27 @@ export default {
       this.dialogDelete = true;
     },
 
-    deleteItemConfirm() {
-      this.formData.skillItems.splice(this.editedIndex, 1);
-      this.skill(this.formData.skillItems);
-      this.closeDelete();
+    deleteItemConfirm(id) {
+      this.$apollo
+        .mutate({
+          // Query
+          mutation: DeleteSkill,
+
+          // Parameters
+          variables: {
+            skillId: id,
+          },
+        })
+        .then(() => {
+          this.formData.skillItems.splice(this.editedIndex, 1);
+          //eslint-disable-next-line no-console
+          console.log("Done");
+          this.closeDelete();
+        })
+        .catch((errors) => {
+          //eslint-disable-next-line no-console
+          console.log(errors);
+        });
     },
 
     close() {
@@ -213,28 +237,62 @@ export default {
       });
     },
 
-    save() {
+    save(id) {
+      //eslint-disable-next-line no-console
+      console.log(id);
       if (this.$refs.form.validate()) {
         if (this.editedIndex > -1) {
-          Object.assign(
-            this.formData.skillItems[this.editedIndex],
-            this.editedItem
-          );
-          this.skill(this.formData.skillItems);
+          this.$apollo
+            .mutate({
+              // Query
+              mutation: UpdateSkill,
+
+              // Parameters
+              variables: {
+                skillId: id,
+                title: this.editedItem.title,
+                type: this.editedItem.type,
+                percentage: parseInt(this.editedItem.percentage),
+              },
+            })
+            .then(() => {
+              this.close();
+            })
+            .catch((errors) => {
+              //eslint-disable-next-line no-console
+              console.log(errors);
+            });
         } else {
-          this.formData.skillItems.push(this.editedItem);
-          this.skill(this.formData.skillItems);
-          // eslint-disable-next-line no-console
-          console.log(this.skill);
+          this.$apollo
+            .mutate({
+              // Query
+              mutation: CreateSkill,
+
+              // Parameters
+              variables: {
+                userId: 1,
+                title: this.editedItem.title,
+                type: this.editedItem.type,
+                percentage: parseInt(this.editedItem.percentage),
+              },
+            })
+            .then(() => {
+              this.formData.skillItems.push(this.editedItem);
+              this.close();
+            })
+            .catch((errors) => {
+              //eslint-disable-next-line no-console
+              console.log(errors);
+            });
         }
       }
 
       this.close();
     },
 
-    ...mapActions({
-      skill: "Portfolio/getSkillData",
-    }),
+    // ...mapActions({
+    //   skill: "Portfolio/getSkillData",
+    // }),
   },
 };
 </script>

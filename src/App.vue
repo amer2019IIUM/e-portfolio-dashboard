@@ -26,7 +26,8 @@ export default {
   }),
   methods: {
     ...mapActions({
-      project: "Portfolio/getProjectData",
+      projects: "Portfolio/getProjectData",
+      skills: "Portfolio/getSkillData",
     }),
   },
   apollo: {
@@ -36,7 +37,10 @@ export default {
 
       update(data) {
         ///SET THE DATA OF THE PROJECT
-        this.project(data.user.projects.data);
+        this.projects(data.user.projects.data);
+
+        ///SET THE DATA OF THE PROJECT
+        this.skills(data.user.skills.data);
         return data;
       },
     },

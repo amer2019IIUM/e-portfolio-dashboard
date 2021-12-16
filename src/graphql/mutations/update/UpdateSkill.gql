@@ -1,12 +1,12 @@
-mutation($userId: ID!, $title: String!, $type: String!, $percentage: Int!) {
-  createSkill(
+mutation($skillId: ID!, $title: String!, $type: String!, $percentage: Int!) {
+  updateSkill(
+    id: $skillId
     input: {
       title: $title
       type: $type
       lang: "Eng"
       sort: 1
       percentage: $percentage
-      user: { connect: $userId }
     }
   ) {
     id
