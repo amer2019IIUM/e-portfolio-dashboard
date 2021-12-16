@@ -1,15 +1,15 @@
 mutation(
-  $userId: ID!
+  $projectId: ID!
   $title: String!
   $desc: String!
   $used_technologies: [String]
   $progress: Int!
   $source_code: String
   $attachment: [CreateAttachmentHasManyInputs]
-  $deletedAttachment: [CreateAttachmentHasManyInputs]
+  $deletedAttachment: [ID!]
 ) {
-  createProject(
-    id: 1
+  updateProject(
+    id: $projectId
     input: {
       title: $title
       lang: "En"
@@ -18,7 +18,6 @@ mutation(
       progress: $progress
       source_code: $source_code
       icon: "String"
-      user: { connect: $userId }
       attachments: { create: $attachment, delete: $deletedAttachment }
     }
   ) {

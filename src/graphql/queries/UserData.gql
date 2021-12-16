@@ -1,0 +1,111 @@
+query {
+  user(id: 1) {
+    id
+    email
+    linkedin
+    twitter
+    facebook
+    github
+    phone_no
+    profiles {
+      data {
+        id
+        first_name
+        last_name
+        summary
+        lang
+        country
+        city
+        nationality
+        headline
+        attachments {
+          id
+          title
+          link
+          attachable_id
+          attachable_type
+        }
+      }
+    }
+    projects {
+      data {
+        id
+        lang
+        title
+        desc
+        progress
+        source_code
+        used_technologies
+        last_update
+        hidden_resume
+        hidden_portfolio
+        attachments {
+          id
+          title
+          link
+          attachable_id
+          attachable_type
+        }
+        technologies {
+          id
+          title
+          version
+        }
+      }
+    }
+    educations {
+      data {
+        id
+        lang
+        desc
+        degree
+        from
+        to
+        CGPA
+        headline
+        school
+        country
+        city
+        hidden_resume
+        hidden_portfolio
+      }
+    }
+    experiences {
+      data {
+        id
+        lang
+        company
+        from
+        to
+        job_title
+        core_duties
+        location
+        further_details
+        hidden_resume
+        hidden_portfolio
+      }
+    }
+    skills {
+      data {
+        id
+        title
+        lang
+        percentage
+        type
+        sort
+        hidden_resume
+        hidden_portfolio
+      }
+    }
+    interests {
+      data {
+        id
+        lang
+        title
+        sort
+        hidden_resume
+        hidden_portfolio
+      }
+    }
+  }
+}

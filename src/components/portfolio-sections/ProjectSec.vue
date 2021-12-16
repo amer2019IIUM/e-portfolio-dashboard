@@ -26,7 +26,7 @@
                   <v-row>
                     <v-col cols="12">
                       <v-text-field
-                        v-model="editedItem.projectTitle"
+                        v-model="editedItem.title"
                         label="Project Title"
                         :rules="titleRules"
                         required
@@ -35,7 +35,7 @@
                     </v-col>
                     <v-col cols="12">
                       <v-text-field
-                        v-model="editedItem.projectDesc"
+                        v-model="editedItem.desc"
                         :counter="500"
                         label="Project Description"
                         :rules="descRules"
@@ -45,7 +45,7 @@
                     </v-col>
                     <v-col cols="12">
                       <v-text-field
-                        v-model="editedItem.projectProgress"
+                        v-model="editedItem.progress"
                         :counter="3"
                         label="Project Progress %"
                         :rules="progressRules"
@@ -55,7 +55,7 @@
                     </v-col>
                     <v-col cols="12">
                       <v-text-field
-                        v-model="editedItem.projectSourceCode"
+                        v-model="editedItem.source_code"
                         label="Source Code"
                         :rules="sourceCodeRules"
                         required
@@ -65,8 +65,8 @@
 
                     <v-col cols="12">
                       <v-combobox
-                        v-model="editedItem.technologies"
-                        :items="technologiesArray"
+                        v-model="editedItem.used_technologies"
+                        :items="editedItem.used_technologies"
                         chips
                         clearable
                         label="Technologies Or tools used"
@@ -112,7 +112,7 @@
                         :disabled="!valid"
                         color="success"
                         class="mr-4"
-                        @click="save"
+                        @click="save(editedItem.attachments, editedItem.id)"
                       >
                         Save
                       </v-btn>
@@ -143,6 +143,7 @@
           </v-dialog>
         </v-toolbar>
       </template>
+
       <template v-slot:item.actions="{ item }">
         <v-icon small class="mr-2" @click="editItem(item)">
           mdi-pencil
@@ -159,10 +160,13 @@
 import { mapGetters, mapActions } from "vuex";
 import ProjectImages from "../helper components/ProjectImages.vue";
 import CreateProject from "../../graphql/mutations/create/CreateProject.gql";
+import UpdateProject from "../../graphql/mutations/update/UpdateProject.gql";
 export default {
   components: { ProjectImages },
   data() {
     return {
+      attachmentPhotos: [],
+      deletedPhotos: [],
       technologiesArray: [],
       activePicker: null,
       activePicker2: null,
@@ -198,40 +202,49 @@ export default {
           text: "Project Title",
           align: "start",
           sortable: false,
-          value: "projectTitle",
+          value: "title",
         },
         {
           text: "Project Description",
           sortable: false,
-          value: "projectDesc",
+          value: "desc",
         },
         {
           text: "Project Progress %",
           sortable: false,
-          value: "projectProgress",
+          value: "progress",
         },
 
         { text: "Source Code", value: "projectSourceCode" },
-        { text: "Screenshots", value: "projectScreenshots" },
-        { text: "Technologies Or tools used", value: "technologies" },
+        { text: "Technologies Or tools used", value: "used_technologies" },
         { text: "Actions", value: "actions", sortable: false },
       ],
       editedIndex: -1,
       editedItem: {
-        projectTitle: "",
-        projectDesc: "",
-        projectProgress: "",
-        projectSourceCode: "",
-        projectScreenshots: "",
-        technologies: [],
+        id: "",
+        title: "",
+        lang: "English",
+        desc: "",
+        progress: "",
+        source_code: "",
+        attachments: [],
+        used_technologies: [],
+        last_update: null,
+        hidden_portfolio: null,
+        hidden_resume: null,
       },
       defaultItem: {
-        projectTitle: "",
-        projectDesc: "",
-        projectProgress: "",
-        projectSourceCode: "",
-        projectScreenshots: "",
-        // technologies: "",
+        id: "",
+        title: "",
+        lang: "English",
+        desc: "",
+        progress: "",
+        source_code: "",
+        attachments: "",
+        used_technologies: [],
+        last_update: null,
+        hidden_portfolio: null,
+        hidden_resume: null,
       },
       formData: {
         ///Project data
@@ -262,20 +275,22 @@ export default {
   },
   created() {
     this.initialize();
-    // eslint-disable-next-line no-console
   },
   methods: {
+    ...mapActions({
+      projectAttachments: "Attachment/getProjectPhotos",
+    }),
     remove(item) {
-      this.editedItem.technologies.splice(
-        this.editedItem.technologies.indexOf(item),
+      this.editedItem.used_technologies.splice(
+        this.editedItem.used_technologies.indexOf(item),
         1
       );
-      this.editedItem.technologies = [...this.editedItem.technologies];
+      this.editedItem.used_technologies = [
+        ...this.editedItem.used_technologies,
+      ];
     },
 
     initialize() {
-      // eslint-disable-next-line no-console
-      console.log(this.projectSecData[this.projectSecData.length - 1]);
       this.formData.projectItems = this.projectSecData;
     },
     reset() {
@@ -298,7 +313,7 @@ export default {
 
     deleteItemConfirm() {
       this.formData.projectItems.splice(this.editedIndex, 1);
-      this.project(this.formData.projectItems);
+      // this.project(this.formData.projectItems);
       this.closeDelete();
     },
 
@@ -318,13 +333,59 @@ export default {
       });
     },
 
-    save() {
+    save(attachments, id) {
       if (this.editedIndex > -1) {
-        Object.assign(
-          this.formData.projectItems[this.editedIndex],
-          this.editedItem
-        );
-        this.project(this.formData.projectItems);
+        if (this.projectPhotos.length == 0) {
+          attachments.forEach((photo) => {
+            let photoObj = new Object();
+            photoObj.title = photo.title;
+            photoObj.link = photo.link;
+            photoObj.type = "PHOTO";
+            this.attachmentPhotos.push(photoObj);
+          });
+          attachments.forEach((photo) => {
+            this.deletedPhotos.push(photo.id);
+          });
+        } else {
+          for (let index = 0; index < this.projectPhotos.length; index++) {
+            let photo = new Object();
+            photo.title = this.projectPhotos[index].name;
+            photo.link = this.projectPhotos[index].path;
+            photo.type = "PHOTO";
+            this.attachmentPhotos[index] = photo;
+          }
+
+          attachments.forEach((photo) => {
+            this.deletedPhotos.push(photo.id);
+          });
+        }
+        if (this.$refs.form.validate()) {
+          this.$apollo
+            .mutate({
+              // Query
+              mutation: UpdateProject,
+              // Parameters
+              variables: {
+                projectId: id,
+                title: this.editedItem.title,
+                desc: this.editedItem.desc,
+                used_technologies: this.editedItem.used_technologies,
+                progress: parseInt(this.editedItem.progress),
+                source_code: this.editedItem.source_code,
+                attachment: this.attachmentPhotos,
+                deletedAttachment: this.deletedPhotos,
+              },
+            })
+            .then(() => {
+              var photosArray = [];
+              this.projectAttachments(photosArray);
+              this.close();
+            })
+            .catch((errors) => {
+              //eslint-disable-next-line no-console
+              console.log(errors);
+            });
+        }
       } else {
         this.formData.projectItems.push(this.editedItem);
         if (this.$refs.form.validate()) {
@@ -334,40 +395,33 @@ export default {
             photo.title = this.projectPhotos[index].name;
             photo.link = this.projectPhotos[index].path;
             photo.type = "PHOTO";
-
             photos[index] = photo;
           }
-          // eslint-disable-next-line
-          console.log(photos);
-          if (photos.length == 0) {
-            this.alert = true; // eslint-disable-next-line
+
+          if (this.projectPhotos.length == 0) {
+            // eslint-disable-next-line
             console.log("Photos should not be not");
           } else {
             this.$apollo
               .mutate({
                 // Query
                 mutation: CreateProject,
+
                 // Parameters
                 variables: {
                   userId: 1,
-                  title: this.projectSecData[this.projectSecData.length - 1]
-                    .projectTitle,
-                  desc: this.projectSecData[this.projectSecData.length - 1]
-                    .projectDesc,
-                  used_technologies: this.projectSecData[
-                    this.projectSecData.length - 1
-                  ].technologies,
-                  progress: parseInt(
-                    this.projectSecData[this.projectSecData.length - 1]
-                      .projectProgress
-                  ),
-                  source_code: "github.com",
+                  title: this.editedItem.title,
+                  desc: this.editedItem.desc,
+                  used_technologies: this.editedItem.used_technologies,
+                  progress: parseInt(this.editedItem.progress),
+                  source_code: this.editedItem.source_code,
                   attachment: photos,
                 },
               })
-              .then((data) => {
+              .then(() => {
                 //eslint-disable-next-line no-console
-                console.log(data);
+                var photosArray = [];
+                this.projectAttachments(photosArray);
                 this.close();
               })
               .catch((errors) => {
@@ -375,14 +429,10 @@ export default {
                 console.log(errors);
               });
           }
-          this.project(this.formData.projectItems);
+          // this.project(this.formData.projectItems);
         }
       }
     },
-
-    ...mapActions({
-      project: "Portfolio/getProjectData",
-    }),
   },
 };
 </script>

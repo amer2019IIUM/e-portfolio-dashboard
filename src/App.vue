@@ -11,6 +11,9 @@
 <script>
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import UserData from "./graphql/queries/UserData.gql";
+import { mapActions } from "vuex";
+
 export default {
   name: "App",
   components: {
@@ -19,7 +22,25 @@ export default {
   },
   data: () => ({
     //
+    loadingKey: 0,
   }),
+  methods: {
+    ...mapActions({
+      project: "Portfolio/getProjectData",
+    }),
+  },
+  apollo: {
+    ads: {
+      query: UserData,
+      loadingKey: "loadingKey",
+
+      update(data) {
+        ///SET THE DATA OF THE PROJECT
+        this.project(data.user.projects.data);
+        return data;
+      },
+    },
+  },
 };
 </script>
 
