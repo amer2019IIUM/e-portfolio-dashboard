@@ -34,11 +34,13 @@ export default {
     }),
   },
   apollo: {
-    ads: {
+    userData: {
       query: UserData,
       loadingKey: "loadingKey",
 
       update(data) {
+        //eslint-disable-next-line
+        // console.log(data.user.projects.data);
         ///SET THE DATA OF THE PROJECT
         this.projects(data.user.projects.data);
 
@@ -53,8 +55,11 @@ export default {
 
         ///SET THE DATA OF THE EXPERIENCE
         this.experiences(data.user.experiences.data);
+        this.$apollo.queries.userData.refetch();
         return data;
       },
+      // Polling interval in milliseconds
+      // pollInterval: 10000,
     },
   },
 };

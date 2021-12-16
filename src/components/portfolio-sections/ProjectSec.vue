@@ -198,6 +198,12 @@ export default {
       dialogDelete: false,
       skillTypes: ["", "Techical", "Professional"],
       headers: [
+        // {
+        //   text: "ID",
+        //   align: "start",
+        //   sortable: false,
+        //   value: "id",
+        // },
         {
           text: "Project Title",
           align: "start",
@@ -387,7 +393,6 @@ export default {
             });
         }
       } else {
-        this.formData.projectItems.push(this.editedItem);
         if (this.$refs.form.validate()) {
           var photos = [];
           for (let index = 0; index < this.projectPhotos.length; index++) {
@@ -418,8 +423,11 @@ export default {
                   attachment: photos,
                 },
               })
-              .then(() => {
-                //eslint-disable-next-line no-console
+              .then((data) => {
+                this.formData.projectItems.push(this.editedItem);
+                this.formData.projectItems[
+                  this.formData.projectItems.length - 1
+                ].id = data.data.createProject.id;
                 var photosArray = [];
                 this.projectAttachments(photosArray);
                 this.close();

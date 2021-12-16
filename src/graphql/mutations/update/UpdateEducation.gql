@@ -1,5 +1,6 @@
 mutation(
   #    $lang: String!
+  $educationId: ID!
   $degree: String!
   $from: Date!
   $to: Date
@@ -9,9 +10,9 @@ mutation(
   $country: String
   $city: String
   $desc: String
-  $userId: ID!
 ) {
-  createEducation(
+  updateEducation(
+    id: $educationId
     input: {
       lang: "eng"
       degree: $degree
@@ -23,7 +24,6 @@ mutation(
       country: $country
       city: $city
       desc: $desc
-      user: { connect: $userId }
     }
   ) {
     id

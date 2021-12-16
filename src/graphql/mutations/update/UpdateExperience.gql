@@ -1,13 +1,14 @@
 mutation(
-  $userId: ID!
-  $company: String!
+  $experienceId: ID!
+  $company: String
   $from: Date
   $to: Date
-  $job_title: String!
+  $job_title: String
   $core_duties: [String]
   $further_details: String
 ) {
-  createExperience(
+  updateExperience(
+    id: $experienceId
     input: {
       company: $company
       lang: "EN"
@@ -17,7 +18,6 @@ mutation(
       core_duties: $core_duties
       location: "Malaysia"
       further_details: $further_details
-      user: { connect: $userId }
     }
   ) {
     id

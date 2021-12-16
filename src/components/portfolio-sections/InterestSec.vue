@@ -129,6 +129,12 @@ export default {
       skillTypes: ["", "Techical", "Professional"],
       headers: [
         {
+          text: "ID",
+          align: "start",
+          sortable: false,
+          value: "id",
+        },
+        {
           text: "Interest Title",
           align: "start",
           sortable: false,
@@ -281,8 +287,11 @@ export default {
                 title: this.editedItem.title,
               },
             })
-            .then(() => {
+            .then((data) => {
               this.formData.interestItems.push(this.editedItem);
+              this.formData.interestItems[
+                this.formData.interestItems.length - 1
+              ].id = data.data.createInterest.id;
               this.close();
             })
             .catch((errors) => {

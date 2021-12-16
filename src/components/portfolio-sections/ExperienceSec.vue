@@ -1,11 +1,7 @@
 <template>
   <div>
     <!-- EXPERIENCE SECTION -->
-    <v-data-table
-      :headers="headers"
-      :items="formData.experiencItems"
-      class="elevation-1"
-    >
+    <v-data-table :headers="headers" :items="formData.experienceItems">
       <template v-slot:top>
         <v-toolbar flat>
           <v-toolbar-title>Experiences</v-toolbar-title>
@@ -26,7 +22,7 @@
                   <v-row>
                     <v-col cols="12">
                       <v-text-field
-                        v-model="editedItem.jobTitle"
+                        v-model="editedItem.job_title"
                         :counter="20"
                         :rules="titleAndorgNameRules"
                         label="Job Title"
@@ -36,7 +32,7 @@
                     </v-col>
                     <v-col cols="12">
                       <v-text-field
-                        v-model="editedItem.orgName"
+                        v-model="editedItem.company"
                         :rules="titleAndorgNameRules"
                         label="Organization name"
                         required
@@ -46,7 +42,7 @@
                     <v-col cols="12">
                       <v-combobox
                         v-model="editedItem.coreDuties"
-                        :items="coreDutiesArray"
+                        :items="editedItem.coreDuties"
                         chips
                         clearable
                         label="Enter Core Duties"
@@ -66,14 +62,14 @@
                           >
                             <strong>{{ item }}</strong
                             >&nbsp;
-                            <span>(interest)</span>
+                            <span> </span>
                           </v-chip>
                         </template>
                       </v-combobox>
                     </v-col>
                     <v-col cols="12">
                       <v-text-field
-                        v-model="editedItem.futherDetails"
+                        v-model="editedItem.further_details"
                         :rules="coreDetaialsAndFutherDetailsRules"
                         label="Futher Details"
                         required
@@ -92,7 +88,7 @@
                         >
                           <template v-slot:activator="{ on, attrs }">
                             <v-text-field
-                              v-model="editItem.joinDate"
+                              v-model="editItem.from"
                               label="Join Date"
                               :rules="dateRules"
                               prepend-icon="mdi-calendar"
@@ -102,7 +98,7 @@
                             ></v-text-field>
                           </template>
                           <v-date-picker
-                            v-model="editItem.joinDate"
+                            v-model="editItem.from"
                             :active-picker.sync="activePicker"
                             :max="
                               new Date(
@@ -130,7 +126,7 @@
                         >
                           <template v-slot:activator="{ on, attrs }">
                             <v-text-field
-                              v-model="editItem.quitDate"
+                              v-model="editItem.to"
                               label="Quit Date"
                               prepend-icon="mdi-calendar"
                               readonly
@@ -139,7 +135,7 @@
                             ></v-text-field>
                           </template>
                           <v-date-picker
-                            v-model="editItem.quitDate"
+                            v-model="editItem.to"
                             :active-picker.sync="activePicker2"
                             :max="
                               new Date(
@@ -164,7 +160,7 @@
                         :disabled="!valid"
                         color="success"
                         class="mr-4"
-                        @click="save"
+                        @click="save(editedItem.id)"
                       >
                         Save
                       </v-btn>
@@ -186,7 +182,10 @@
                 <v-btn color="blue darken-1" text @click="closeDelete"
                   >Cancel</v-btn
                 >
-                <v-btn color="blue darken-1" text @click="deleteItemConfirm"
+                <v-btn
+                  color="blue darken-1"
+                  text
+                  @click="deleteItemConfirm(editedItem.id)"
                   >OK</v-btn
                 >
                 <v-spacer></v-spacer>
@@ -208,8 +207,10 @@
 </template>
 
 <script>
-import { mapGetters,mapActions } from "vuex";
- 
+import { mapGetters } from "vuex";
+import CreateExperience from "../../graphql/mutations/create/CreateExperience.gql";
+import UpdateExperience from "../../graphql/mutations/update/UpdateExperience.gql";
+import DeleteExperience from "../../graphql/mutations/delete/DeleteExperience.gql";
 export default {
   data() {
     return {
@@ -237,43 +238,53 @@ export default {
       skillTypes: ["", "Techical", "Professional"],
       headers: [
         {
+          text: "ID",
+          align: "start",
+          sortable: false,
+          value: "id",
+        },
+        {
           text: "Job Title",
           align: "start",
           sortable: false,
-          value: "jobTitle",
+          value: "job_title",
         },
         {
           text: "Organization name",
           sortable: false,
-          value: "orgName",
+          value: "company",
         },
 
-        { text: "Core Duties", value: "coreDuties" },
+        { text: "Core Duties", value: "core_duties" },
         { text: "Futher Details", value: "futherDetails" },
-        { text: "Join Date", sortable: false, value: "joinDate" },
-        { text: "Quit Date", sortable: false, value: "quitDate" },
+        { text: "Join Date", sortable: false, value: "from" },
+        { text: "Quit Date", sortable: false, value: "to" },
         { text: "Actions", value: "actions", sortable: false },
       ],
       editedIndex: -1,
       editedItem: {
-        jobTitle: "",
-        orgName: "",
-        coreDuties: "",
-        futherDetails: "",
-        joinDate: "",
-        quitDate: "",
+        id: "",
+        company: "",
+        from: null,
+        to: null,
+        job_title: "",
+        core_duties: [],
+        location: "",
+        further_details: "",
       },
       defaultItem: {
-        jobTitle: "",
-        orgName: "",
-        coreDuties: "",
-        futherDetails: "",
-        joinDate: "",
-        quitDate: "",
+        id: "",
+        company: "",
+        from: null,
+        to: null,
+        job_title: "",
+        core_duties: [],
+        location: "",
+        further_details: "",
       },
       formData: {
         ///experience data
-        experiencItems: null,
+        experienceItems: null,
         hiddenResumeSkill: false,
         hiddenPortfolioSkill: false,
       },
@@ -325,7 +336,7 @@ export default {
       this.$refs.menu2.save(date);
     },
     initialize() {
-      this.formData.experiencItems = this.experienceSecData;
+      this.formData.experienceItems = this.experienceSecData;
     },
     reset() {
       this.$refs.form.reset();
@@ -334,21 +345,38 @@ export default {
       this.$refs.form.resetValidation();
     },
     editItem(item) {
-      this.editedIndex = this.formData.experiencItems.indexOf(item);
+      this.editedIndex = this.formData.experienceItems.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
 
     deleteItem(item) {
-      this.editedIndex = this.formData.experiencItems.indexOf(item);
+      this.editedIndex = this.formData.experienceItems.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
     },
 
-    deleteItemConfirm() {
-      this.formData.experiencItems.splice(this.editedIndex, 1);
-      this.experience(this.formData.experiencItems);
-      this.closeDelete();
+    deleteItemConfirm(id) {
+      this.$apollo
+        .mutate({
+          // Query
+          mutation: DeleteExperience,
+
+          // Parameters
+          variables: {
+            experienceId: id,
+          },
+        })
+        .then(() => {
+          this.formData.experienceItems.splice(this.editedIndex, 1);
+          //eslint-disable-next-line no-console
+          console.log("Done");
+          this.closeDelete();
+        })
+        .catch((errors) => {
+          //eslint-disable-next-line no-console
+          console.log(errors);
+        });
     },
 
     close() {
@@ -367,27 +395,80 @@ export default {
       });
     },
 
-    save() {
+    formatDate(date) {
+      var d = new Date(date),
+        month = "" + (d.getMonth() + 1),
+        day = "" + d.getDate(),
+        year = d.getFullYear();
+
+      if (month.length < 2) month = "0" + month;
+      if (day.length < 2) day = "0" + day;
+
+      return [year, month, day].join("-");
+    },
+    save(id) {
       if (this.$refs.form.validate()) {
-        // eslint-disable-next-line no-console
-        console.log(this.formData.experiencItems);
-        // if (this.editedIndex > -1) {
-        //   Object.assign(
-        //     this.formData.experiencItems[this.editedIndex],
-        //     this.editedItem
-        //   );
-        //   this.experience(this.formData.experiencItems);
-        // } else {
-        //   this.formData.experiencItems.push(this.editedItem);
-        //   this.experience(this.formData.experiencItems);
-        // }
-        this.close();
+        //eslint-disable-next-line no-console
+        console.log("HI");
+        if (this.editedIndex > -1) {
+          this.$apollo
+            .mutate({
+              // Query
+              mutation: UpdateExperience,
+
+              // Parameters
+              variables: {
+                experienceId: id,
+                job_title: this.editedItem.job_title,
+                core_duties: this.editedItem.core_duties,
+                further_details: this.editedItem.further_details,
+                company: this.editedItem.company,
+                from: this.formatDate(this.editedItem.from),
+                to: this.formatDate(this.editedItem.from),
+              },
+            })
+            .then(() => {
+              Object.assign(
+                this.formData.experienceItems[this.editedIndex],
+                this.editedItem
+              );
+              this.close();
+            })
+            .catch((errors) => {
+              //eslint-disable-next-line no-console
+              console.log(errors);
+            });
+        } else {
+          this.$apollo
+            .mutate({
+              // Query
+              mutation: CreateExperience,
+
+              // Parameters
+              variables: {
+                userId: 1,
+                job_title: this.editedItem.job_title,
+                core_duties: this.editedItem.core_duties,
+                further_details: this.editedItem.further_details,
+                company: this.editedItem.company,
+                from: this.formatDate(this.editedItem.from),
+                to: this.formatDate(this.editedItem.to),
+              },
+            })
+            .then((data) => {
+              this.formData.experienceItems.push(this.editedItem);
+              this.formData.experienceItems[
+                this.formData.experienceItems.length - 1
+              ].id = data.data.createExperience.id;
+              this.close();
+            })
+            .catch((errors) => {
+              //eslint-disable-next-line no-console
+              console.log(errors);
+            });
+        }
       }
     },
-
-    ...mapActions({
-      experience: "Portfolio/getExperienceData",
-    }),
   },
 };
 </script>

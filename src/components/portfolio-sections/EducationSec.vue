@@ -27,17 +27,27 @@
                     <v-col cols="12">
                       <v-text-field
                         v-model="editedItem.degree"
-                        :counter="20"
+                        :counter="50"
                         :rules="generalRequiredFieldsRules"
-                        label="Dgree"
+                        label="Degree"
                         required
                       >
                       </v-text-field>
                     </v-col>
                     <v-col cols="12">
                       <v-text-field
-                        v-model="editedItem.cgpa"
+                        v-model="editedItem.desc"
+                        :counter="50"
                         :rules="generalRequiredFieldsRules"
+                        label="Description"
+                        required
+                      >
+                      </v-text-field>
+                    </v-col>
+                    <v-col cols="12">
+                      <v-text-field
+                        v-model="editedItem.CGPA"
+                        :rules="cgpaRules"
                         label="CGPA"
                         required
                       >
@@ -45,7 +55,7 @@
                     </v-col>
                     <v-col cols="12">
                       <v-text-field
-                        v-model="editedItem.educationHeadline"
+                        v-model="editedItem.headline"
                         :rules="generalRequiredFieldsRules"
                         label="Headline"
                         required
@@ -93,7 +103,7 @@
                         >
                           <template v-slot:activator="{ on, attrs }">
                             <v-text-field
-                              v-model="editItem.startedAt"
+                              v-model="editedItem.from"
                               label="Started Date"
                               :rules="dateRules"
                               prepend-icon="mdi-calendar"
@@ -103,7 +113,7 @@
                             ></v-text-field>
                           </template>
                           <v-date-picker
-                            v-model="editItem.startedAt"
+                            v-model="editedItem.from"
                             :active-picker.sync="activePicker"
                             :max="
                               new Date(
@@ -131,7 +141,7 @@
                         >
                           <template v-slot:activator="{ on, attrs }">
                             <v-text-field
-                              v-model="editItem.finishedAt"
+                              v-model="editedItem.to"
                               label="Finished Date"
                               prepend-icon="mdi-calendar"
                               readonly
@@ -140,7 +150,7 @@
                             ></v-text-field>
                           </template>
                           <v-date-picker
-                            v-model="editItem.finishedAt"
+                            v-model="editedItem.to"
                             :active-picker.sync="activePicker2"
                             :max="
                               new Date(
@@ -165,7 +175,7 @@
                         :disabled="!valid"
                         color="success"
                         class="mr-4"
-                        @click="save"
+                        @click="save(editedItem.id)"
                       >
                         Save
                       </v-btn>
@@ -187,7 +197,10 @@
                 <v-btn color="blue darken-1" text @click="closeDelete"
                   >Cancel</v-btn
                 >
-                <v-btn color="blue darken-1" text @click="deleteItemConfirm"
+                <v-btn
+                  color="blue darken-1"
+                  text
+                  @click="deleteItemConfirm(editedItem.id)"
                   >OK</v-btn
                 >
                 <v-spacer></v-spacer>
@@ -209,33 +222,37 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
-
+import { mapGetters } from "vuex";
+import CreateEducation from "../../graphql/mutations/create/CreateEducation.gql";
+import UpdateEducation from "../../graphql/mutations/update/UpdateEducation.gql";
+import DeleteEducation from "../../graphql/mutations/delete/DeleteEducation.gql";
 export default {
   data() {
     return {
-      coreDutiesArray: [],
       activePicker: null,
       activePicker2: null,
       valid: false,
       menu: false,
       menu2: false,
-
+      lastCreatedId: null,
       dateRules: [(v) => !!v || "Join Date is required"],
       generalRequiredFieldsRules: [
         (v) => !!v || "Field is required!",
         (v) => (v && v.length <= 50) || "Field must be less than 10 characters",
       ],
-      coreDetaialsAndFutherDetailsRules: [
-        // (v) => !!v || "Job Title is required",
-        (v) =>
-          (v && v.length <= 50) || "Job Title must be less than 10 characters",
-      ],
+      cgpaRules: [(v) => (v >= 0 && v <= 10) || "The maximum CGPA is 10!"],
+
       experienceJoin: false,
       dialog: false,
       dialogDelete: false,
       skillTypes: ["", "Techical", "Professional"],
       headers: [
+        {
+          text: "Id",
+          align: "start",
+          sortable: false,
+          value: "id",
+        },
         {
           text: "Degree",
           align: "start",
@@ -245,41 +262,46 @@ export default {
         {
           text: "Started at",
           sortable: false,
-          value: "startedAt",
+          value: "from",
         },
         {
           text: "Finished at",
           sortable: false,
-          value: "finishedAt",
+          value: "to",
         },
 
-        { text: "CGAP", value: "cgpa" },
-        { text: "Headline", value: "educationHeadline" },
+        { text: "CGAP", value: "CGPA" },
+        { text: "Headline", value: "headline" },
         { text: "School", value: "school" },
         { text: "University Country", value: "country" },
         { text: "City", value: "city" },
+        { text: "City", value: "desc" },
         { text: "Actions", value: "actions", sortable: false },
       ],
       editedIndex: -1,
       editedItem: {
+        id: "",
         degree: "",
-        startedAt: "",
-        finishedAt: "",
-        cgpa: "",
-        educationHeadline: "",
+        from: null,
+        to: null,
+        CGPA: null,
+        headline: "",
         school: "",
         country: "",
         city: "",
+        desc: "",
       },
       defaultItem: {
+        id: "",
         degree: "",
-        startedAt: "",
-        finishedAt: "",
-        cgpa: "",
-        educationHeadline: "",
+        from: null,
+        to: null,
+        CGPA: null,
+        headline: "",
         school: "",
         country: "",
         city: "",
+        desc: "",
       },
       formData: {
         ///EDUCATION data
@@ -355,10 +377,25 @@ export default {
       this.dialogDelete = true;
     },
 
-    deleteItemConfirm() {
-      this.formData.educationItems.splice(this.editedIndex, 1);
-      this.education(this.formData.educationItems);
-      this.closeDelete();
+    deleteItemConfirm(id) {
+      this.$apollo
+        .mutate({
+          // Query
+          mutation: DeleteEducation,
+
+          // Parameters
+          variables: {
+            educationId: id,
+          },
+        })
+        .then(() => {
+          this.formData.educationItems.splice(this.editedIndex, 1);
+          this.closeDelete();
+        })
+        .catch((errors) => {
+          //eslint-disable-next-line no-console
+          console.log(errors);
+        });
     },
 
     close() {
@@ -376,28 +413,84 @@ export default {
         this.editedIndex = -1;
       });
     },
+    formatDate(date) {
+      var d = new Date(date),
+        month = "" + (d.getMonth() + 1),
+        day = "" + d.getDate(),
+        year = d.getFullYear();
 
-    save() {
+      if (month.length < 2) month = "0" + month;
+      if (day.length < 2) day = "0" + day;
+
+      return [year, month, day].join("-");
+    },
+    save(id) {
       if (this.$refs.form.validate()) {
         if (this.editedIndex > -1) {
-          Object.assign(
-            this.formData.educationItems[this.editedIndex],
-            this.editedItem
-          );
-          this.education(this.formData.educationItems);
+          this.$apollo
+            .mutate({
+              // Query
+              mutation: UpdateEducation,
+
+              // Parameters
+              variables: {
+                educationId: id,
+                degree: this.editedItem.degree,
+                from: this.editedItem.from,
+                to: this.editedItem.to,
+                CGPA: parseInt(this.editedItem.CGPA),
+                headline: this.editedItem.headline,
+                school: this.editedItem.school,
+                city: this.editedItem.city,
+                country: this.editedItem.country,
+                desc: this.editedItem.desc,
+              },
+            })
+            .then(() => {
+              Object.assign(
+                this.formData.educationItems[this.editedIndex],
+                this.editedItem
+              );
+              this.close();
+            })
+            .catch((errors) => {
+              //eslint-disable-next-line no-console
+              console.log(errors);
+            });
         } else {
-          this.formData.educationItems.push(this.editedItem);
-          this.education(this.formData.educationItems);
-          // eslint-disable-next-line no-console
-          console.log(this.education);
+          this.$apollo
+            .mutate({
+              // Query
+              mutation: CreateEducation,
+
+              // Parameters
+              variables: {
+                userId: 1,
+                degree: this.editedItem.degree,
+                from: this.formatDate(this.editedItem.from),
+                to: this.formatDate(this.editedItem.to),
+                CGPA: parseInt(this.editedItem.CGPA),
+                headline: this.editedItem.headline,
+                school: this.editedItem.school,
+                city: this.editedItem.city,
+                country: this.editedItem.country,
+                desc: this.editedItem.desc,
+              },
+            })
+            .then((data) => {
+              this.formData.educationItems.push(this.editedItem);
+              this.formData.educationItems[
+                this.formData.educationItems.length - 1
+              ].id = data.data.createEducation.id;
+              this.close();
+            })
+            .catch((errors) => {
+              //eslint-disable-next-line no-console
+              console.log(errors);
+            });
         }
-        this.close();
       }
     },
-
-    ...mapActions({
-      education: "Portfolio/getEducationData",
-    }),
   },
 };
 </script>
