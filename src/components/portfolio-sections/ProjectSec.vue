@@ -134,7 +134,10 @@
                 <v-btn color="blue darken-1" text @click="closeDelete"
                   >Cancel</v-btn
                 >
-                <v-btn color="blue darken-1" text @click="deleteItemConfirm"
+                <v-btn
+                  color="blue darken-1"
+                  text
+                  @click="deleteItemConfirm(editedItem.id)"
                   >OK</v-btn
                 >
                 <v-spacer></v-spacer>
@@ -161,6 +164,7 @@ import { mapGetters, mapActions } from "vuex";
 import ProjectImages from "../helper components/ProjectImages.vue";
 import CreateProject from "../../graphql/mutations/create/CreateProject.gql";
 import UpdateProject from "../../graphql/mutations/update/UpdateProject.gql";
+import DeleteProject from "../../graphql/mutations/delete/DeleteProject.gql";
 export default {
   components: { ProjectImages },
   data() {
@@ -317,10 +321,25 @@ export default {
       this.dialogDelete = true;
     },
 
-    deleteItemConfirm() {
-      this.formData.projectItems.splice(this.editedIndex, 1);
-      // this.project(this.formData.projectItems);
-      this.closeDelete();
+    deleteItemConfirm(id) {
+      this.$apollo
+        .mutate({
+          // Query
+          mutation: DeleteProject,
+          // Parameters
+          variables: {
+            projectId: id,
+          },
+        })
+        .then(() => {
+          this.formData.projectItems.splice(this.editedIndex, 1);
+          // this.project(this.formData.projectItems);
+          this.closeDelete();
+        })
+        .catch((errors) => {
+          //eslint-disable-next-line no-console
+          console.log(errors);
+        });
     },
 
     close() {

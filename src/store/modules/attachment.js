@@ -1,7 +1,7 @@
 
 const state = {
     projectPhotos: [],
-    profilePhoto: "",
+    profilePhoto: [],
 };
 
 const getters = {

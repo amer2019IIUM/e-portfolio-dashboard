@@ -33,15 +33,20 @@ export default {
   },
   methods: {
     ...mapActions({
-      profilePhoto: "Attachment/getProfilephoto",
+      getProfilephoto: "Attachment/getProfilephoto",
     }),
     onChange() {
-      // eslint-disable-next-line no-console
-      console.log("New picture selected!");
       if (this.$refs.pictureInput.image) {
-        this.profilePhoto(this.$refs.pictureInput.image);
+        let arrayPhotos = [];
+        let photo = new Object();
+        photo.title = "profile photo";
+        photo.link = this.$refs.pictureInput.image;
+        photo.type = "PHOTO";
+
+        arrayPhotos.push(photo);
         // eslint-disable-next-line no-console
-        console.log(this.$refs.pictureInput.image);
+        console.log(arrayPhotos);
+        this.getProfilephoto(arrayPhotos);
       } else {
         // eslint-disable-next-line no-console
         console.log("FileReader API not supported: use the <form>, Luke!");

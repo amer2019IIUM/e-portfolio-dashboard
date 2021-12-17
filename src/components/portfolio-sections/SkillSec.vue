@@ -256,6 +256,10 @@ export default {
               },
             })
             .then(() => {
+              Object.assign(
+                this.formData.interestItems[this.editedIndex],
+                this.editedItem
+              );
               this.close();
             })
             .catch((errors) => {
@@ -276,9 +280,10 @@ export default {
                 percentage: parseInt(this.editedItem.percentage),
               },
             })
-            .then(() => {
-              // this.formData.skillItems.push(this.editedItem);
-              this.initialize();
+            .then((data) => {
+              this.formData.skillItems.push(this.editedItem);
+              this.formData.skillItems[this.formData.skillItems.length - 1].id =
+                data.data.createSkill.id;
               this.close();
             })
             .catch((errors) => {

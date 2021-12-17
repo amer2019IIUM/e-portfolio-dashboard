@@ -111,6 +111,9 @@ import SkillSec from "../../components/portfolio-sections/SkillSec.vue";
 import EducationSec from "../../components/portfolio-sections/EducationSec.vue";
 import InterestSec from "../../components/portfolio-sections/InterestSec.vue";
 import ProjectSec from "../../components/portfolio-sections/ProjectSec.vue";
+import CreateProfile from "../../graphql/mutations/create/CreateProfile.gql";
+import UpdateProfile from "../../graphql/mutations/update/UpdateProfile.gql";
+import UpdateUser from "../../graphql/mutations/update/UpdateUser.gql";
 export default {
   name: "Create-portfolio",
   mixins: [ValidationHelper],
@@ -132,9 +135,10 @@ export default {
       experienceJoin: false,
       dialog: false,
       dialogDelete: false,
-
+      deletedAttachments: [],
       formData: {
         //Home Data
+        id: "",
         firstName: "",
         secondName: "",
         headline: "",
@@ -221,6 +225,7 @@ export default {
     ...mapGetters({
       profileSecData: "Portfolio/profileSecData",
       userSecData: "Portfolio/userSecData",
+      profilePhoto: "Attachment/profilePhoto",
     }),
   },
   watch: {
@@ -240,6 +245,7 @@ export default {
         // eslint-disable-next-line
         console.log("New User");
         //PROFILE Data
+        this.formData.id = this.profileSecData.id;
         this.formData.firstName = this.profileSecData.first_name;
         this.formData.secondName = this.profileSecData.last_name;
         this.formData.headline = this.profileSecData.headline;
@@ -258,6 +264,12 @@ export default {
         this.formData.linkedIn = this.userSecData.linkedin;
         this.formData.email = this.userSecData.email;
       }
+
+      if (this.profileSecData !== undefined) {
+        if (this.profileSecData.attachments.length >= 1) {
+          this.deletedAttachments.push(this.profileSecData.attachments[0].id);
+        }
+      }
     },
     saveExperienceJoinDate(date) {
       this.$refs.menu.save(date);
@@ -265,6 +277,7 @@ export default {
     },
 
     nextStep() {
+      // eslint-disable-next-line no-console
       ///Set Home Data
       this.home = this.formData;
 
@@ -288,7 +301,117 @@ export default {
       this.interest = this.formData;
     },
     onComplete() {
-      alert("Submitting Form ! Rock On");
+      this.$apollo
+        .mutate({
+          // Query
+          mutation: UpdateUser,
+
+          // Parameters
+          variables: {
+            userId: "1",
+            email: this.formData.email,
+            linkedin: this.formData.linkedIn,
+            twitter: this.formData.twitter,
+            facebook: this.formData.facebook,
+            github: this.formData.github,
+            phone_no: this.formData.phoneNo,
+            dribbble: this.formData.dribbble,
+          },
+        })
+        .then(() => {
+          //eslint-disable-next-line no-console
+          console.log("User Updated");
+          if (this.profileSecData === undefined) {
+            this.$apollo
+              .mutate({
+                // Query
+                mutation: CreateProfile,
+
+                // Parameters
+                variables: {
+                  first_name: this.formData.firstName,
+                  last_name: this.formData.firstName,
+                  country: this.formData.firstName,
+                  city: this.formData.firstName,
+                  nationality: this.formData.firstName,
+                  summary: this.formData.firstName,
+                  headline: this.formData.firstName,
+                  attachments: [...this.profilePhoto],
+                  userId: "1",
+                },
+              })
+              .then(() => {
+                //eslint-disable-next-line no-console
+                console.log("DONE");
+              })
+              .catch((errors) => {
+                //eslint-disable-next-line no-console
+                console.log(errors);
+              });
+          } else {
+            if (this.profilePhoto.length >= 1) {
+              this.$apollo
+                .mutate({
+                  // Query
+                  mutation: UpdateProfile,
+
+                  // Parameters
+                  variables: {
+                    profileId: this.formData.id,
+                    first_name: this.formData.firstName,
+                    last_name: this.formData.firstName,
+                    country: this.formData.firstName,
+                    city: this.formData.firstName,
+                    nationality: this.formData.firstName,
+                    summary: this.formData.firstName,
+                    headline: this.formData.firstName,
+                    attachments: this.profilePhoto,
+                    attachmentsDeleted: this.deletedAttachments,
+                  },
+                })
+                .then(() => {
+                  //eslint-disable-next-line no-console
+                  console.log("Updated!");
+                })
+                .catch((errors) => {
+                  //eslint-disable-next-line no-console
+                  console.log(errors);
+                });
+            } else {
+              // eslint-disable-next-line no-console
+              console.log("s");
+              this.$apollo
+                .mutate({
+                  // Query
+                  mutation: UpdateProfile,
+
+                  // Parameters
+                  variables: {
+                    profileId: this.formData.id,
+                    first_name: this.formData.firstName,
+                    last_name: this.formData.firstName,
+                    country: this.formData.firstName,
+                    city: this.formData.firstName,
+                    nationality: this.formData.firstName,
+                    summary: this.formData.firstName,
+                    headline: this.formData.firstName,
+                  },
+                })
+                .then(() => {
+                  //eslint-disable-next-line no-console
+                  console.log("Updated!");
+                })
+                .catch((errors) => {
+                  //eslint-disable-next-line no-console
+                  console.log(errors);
+                });
+            }
+          }
+        })
+        .catch((errors) => {
+          //eslint-disable-next-line no-console
+          console.log(errors);
+        });
     },
     // ...mapActions({
     //   home: "Portfolio/getHomeData",

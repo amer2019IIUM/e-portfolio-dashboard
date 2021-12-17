@@ -7,9 +7,11 @@ mutation(
   $summary: String!
   $headline: String!
   $attachments: [CreateAttachmentHasManyInputs]
-  $userId: ID!
+  $attachmentsDeleted: [ID!]
+  $profileId: ID!
 ) {
-  createProfile(
+  updateProfile(
+    id: $profileId
     input: {
       first_name: $first_name
       last_name: $last_name
@@ -19,8 +21,7 @@ mutation(
       nationality: $nationality
       summary: $summary
       headline: $headline
-      user: { connect: $userId }
-      attachments: { create: $attachments }
+      attachments: { create: $attachments, delete: $attachmentsDeleted }
     }
   ) {
     id
