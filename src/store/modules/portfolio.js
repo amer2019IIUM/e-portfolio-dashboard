@@ -1,7 +1,7 @@
 
 const state = {
-    homeSecData: null,
-    aboutSecData: null,
+    userSecData: null,
+    profileSecData: null,
     skillSecData: [],
     experienceSecData: [],
     educationSecData: [],
@@ -10,8 +10,8 @@ const state = {
 };
 
 const getters = {
-    homeSecData: state => state.homeSecData,
-    aboutSecData: state => state.aboutSecData,
+    userSecData: state => state.userSecData,
+    profileSecData: state => state.profileSecData,
     skillSecData: state => state.skillSecData,
     experienceSecData: state => state.experienceSecData,
     educationSecData: state => state.educationSecData,
@@ -20,11 +20,11 @@ const getters = {
 };
 
 const actions = {
-    async getHomeData({ commit }, data) {
-        await commit('GET_HOME_DATA', data);
+    async getUserData({ commit }, data) {
+        await commit('GET_USER_DATA', data);
     },
-    async getAboutData({ commit }, data) {
-        await commit('GET_ABOUT_DATA', data);
+    async getProfileData({ commit }, data) {
+        await commit('GET_PROFILE_DATA', data);
     },
     async getSkillData({ commit }, data) {
         await commit('GET_SKILL_DATA', data);
@@ -43,11 +43,11 @@ const actions = {
     },
 };
 const mutations = {
-    GET_HOME_DATA(state, payload) {
-        state.homeSecData = payload
+    GET_USER_DATA(state, payload) {
+        state.userSecData = payload
     },
-    GET_ABOUT_DATA(state, payload) {
-        state.aboutSecData = payload
+    GET_PROFILE_DATA(state, payload) {
+        state.profileSecData = payload
     },
     GET_SKILL_DATA(state, payload) {
         state.skillSecData = payload

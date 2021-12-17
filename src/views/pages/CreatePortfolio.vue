@@ -7,16 +7,36 @@
       @onNextStep="nextStep"
     >
       <!-- HOME SECTION -->
-      <tab-content title="HOME SECTION" :selected="true" class="mb-2">
-        <v-card max-width="1300" height="10%" color="#434b4bf2" dark outlined>
-          <v-list-item>
-            <v-list-item-content>
-              <v-list-item-title class="text-h5 mb-1">
-                Personal Details
-              </v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </v-card>
+      <tab-content title="USER SECTION" :selected="true" class="mb-2">
+        <v-text-field
+          label="Facebook"
+          v-model="formData.facebook"
+        ></v-text-field>
+        <v-text-field label="Twitter" v-model="formData.twitter"></v-text-field>
+        <v-text-field
+          label="LinkedIn"
+          v-model="formData.linkedIn"
+        ></v-text-field>
+        <v-text-field label="Githib" v-model="formData.github"></v-text-field>
+        <v-text-field
+          label="Dribbble"
+          v-model="formData.dribbble"
+        ></v-text-field>
+        <v-text-field label="Email" v-model="formData.email"></v-text-field>
+        <v-alert dense outlined type="error" v-if="hasError('email')">
+          Should be an <strong>Email</strong>!
+        </v-alert>
+        <v-text-field
+          label="Phone Number"
+          v-model="formData.phoneNo"
+        ></v-text-field>
+        <v-alert dense outlined type="error" v-if="hasError('phoneNo')">
+          <strong>Phone No</strong> is required!
+        </v-alert>
+      </tab-content>
+
+      <!-- PROFILE SECTION -->
+      <tab-content title="PROFILE SECTION">
         <v-text-field
           label="First Name"
           v-model="formData.firstName"
@@ -36,59 +56,6 @@
         <v-alert dense outlined type="error" v-if="hasError('headline')">
           <strong>Headline</strong> is required!
         </v-alert>
-        <v-text-field label="Email" v-model="formData.email"></v-text-field>
-        <v-alert dense outlined type="error" v-if="hasError('email')">
-          Should be an <strong>Email</strong>!
-        </v-alert>
-        <v-text-field
-          label="Phone Number"
-          v-model="formData.phoneNo"
-        ></v-text-field>
-        <v-alert dense outlined type="error" v-if="hasError('phoneNo')">
-          <strong>Phone No</strong> is required!
-        </v-alert>
-        <v-text-field label="Location" v-model="formData.location">
-        </v-text-field>
-        <v-alert dense outlined type="error" v-if="hasError('location')">
-          <strong>Location</strong> is required!
-        </v-alert>
-        <v-col cols="12" sm="6" md="4" class="mt-3">
-          <image-upload />
-        </v-col>
-        <v-card
-          class="d-flex justify-center mb-6"
-          max-width="13000"
-          style="min-height:30px !important"
-          dark
-          color="#434b4bf2"
-          outlined
-        >
-          <v-list-item>
-            <v-list-item-content>
-              <v-list-item-title class="text-h5 mb-1">
-                Social Media
-              </v-list-item-title>
-            </v-list-item-content>
-          </v-list-item>
-        </v-card>
-        <v-text-field
-          label="Facebook"
-          v-model="formData.facebook"
-        ></v-text-field>
-        <v-text-field label="Twitter" v-model="formData.twitter"></v-text-field>
-        <v-text-field
-          label="LinkedIn"
-          v-model="formData.linkedIn"
-        ></v-text-field>
-        <v-text-field label="Githib" v-model="formData.github"></v-text-field>
-        <v-text-field
-          label="Dribbble"
-          v-model="formData.dribbble"
-        ></v-text-field>
-      </tab-content>
-
-      <!-- ABOUT SECTION -->
-      <tab-content title="ABOUT SECTION">
         <v-textarea
           label="Summary about you"
           outlined
@@ -101,6 +68,9 @@
         <v-alert dense outlined type="error" v-if="hasError('summary')">
           <strong>Summary</strong> is required!
         </v-alert>
+        <v-col cols="12">
+          <image-upload />
+        </v-col>
       </tab-content>
       <tab-content title="SKILL SECTION">
         <skill-sec />
@@ -133,7 +103,7 @@ import { ValidationHelper } from "vue-step-wizard";
 import "vue-step-wizard/dist/vue-step-wizard.css";
 import { required } from "vuelidate/lib/validators";
 import { email } from "vuelidate/lib/validators";
-
+import { mapGetters } from "vuex";
 // import { numeric } from "vuelidate/lib/validators";
 import ImageUpload from "../../components/ImageUpload.vue";
 import ExperienceSec from "../../components/portfolio-sections/ExperienceSec.vue";
@@ -165,24 +135,24 @@ export default {
 
       formData: {
         //Home Data
-        firstName: "sd",
-        secondName: "sf",
-        headline: "sf",
-        phoneNo: "sf",
-        location: "sf",
-        facebook: "sf",
-        github: "sd",
-        twitter: "sd",
-        dribbble: "sd",
-        linkedIn: "sd",
-        email: "sd@asd.asd",
+        firstName: "",
+        secondName: "",
+        headline: "",
+        phoneNo: "",
+        // location: "",
+        facebook: "",
+        github: "",
+        twitter: "",
+        dribbble: "",
+        linkedIn: "",
+        email: "",
 
         ///about data
-        summary: "sd",
+        summary: "",
 
         ///Education data
-        degree: "sd",
-        start_from: "sd",
+        degree: "",
+        start_from: "",
         finish_in: null,
         CGPA: false,
         educationHeadline: "",
@@ -220,18 +190,20 @@ export default {
       },
       validationRules: [
         {
-          firstName: { required },
-          secondName: { required },
-          headline: { required },
           phoneNo: { required },
-          location: { required },
+          // location: { required },
           facebook: { required },
           github: { required },
           twitter: { required },
           dribbble: { required },
           email: { required, email },
         },
-        { summary: { required } },
+        {
+          firstName: { required },
+          secondName: { required },
+          headline: { required },
+          summary: { required },
+        },
         { summary: { required } },
         { summary: { required } },
         { summary: { required } },
@@ -245,6 +217,11 @@ export default {
     formTitle() {
       return this.editedIndex === -1 ? "New Item" : "Edit Item";
     },
+
+    ...mapGetters({
+      profileSecData: "Portfolio/profileSecData",
+      userSecData: "Portfolio/userSecData",
+    }),
   },
   watch: {
     menu(val) {
@@ -254,8 +231,34 @@ export default {
       val && setTimeout(() => (this.activePicker = "YEAR"));
     },
   },
-  created() {},
+  created() {
+    this.initialize();
+  },
   methods: {
+    initialize() {
+      if (this.profileSecData !== undefined) {
+        // eslint-disable-next-line
+        console.log("New User");
+        //PROFILE Data
+        this.formData.firstName = this.profileSecData.first_name;
+        this.formData.secondName = this.profileSecData.last_name;
+        this.formData.headline = this.profileSecData.headline;
+        this.formData.summary = this.profileSecData.summary;
+      }
+
+      if (this.userSecData !== undefined) {
+        // eslint-disable-next-line
+        console.log("New User");
+        ////USER data
+        this.formData.phoneNo = this.userSecData.phone_no;
+        this.formData.facebook = this.userSecData.facebook;
+        this.formData.github = this.userSecData.github;
+        this.formData.twitter = this.userSecData.twitter;
+        this.formData.dribbble = this.userSecData.dribbble;
+        this.formData.linkedIn = this.userSecData.linkedin;
+        this.formData.email = this.userSecData.email;
+      }
+    },
     saveExperienceJoinDate(date) {
       this.$refs.menu.save(date);
       this.$refs.experienceJoin.save(date);

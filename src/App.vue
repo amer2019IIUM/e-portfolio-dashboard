@@ -2,7 +2,12 @@
   <v-app>
     <Navbar />
     <v-content>
-      <router-view></router-view>
+      <div v-if="loadingKey">
+        WAITING
+      </div>
+      <div v-else>
+        <router-view> </router-view>
+      </div>
     </v-content>
     <Footer />
   </v-app>
@@ -31,6 +36,8 @@ export default {
       interests: "Portfolio/getInterestData",
       educations: "Portfolio/getEducationData",
       experiences: "Portfolio/getExperienceData",
+      profiles: "Portfolio/getProfileData",
+      user: "Portfolio/getUserData",
     }),
   },
   apollo: {
@@ -55,7 +62,10 @@ export default {
 
         ///SET THE DATA OF THE EXPERIENCE
         this.experiences(data.user.experiences.data);
-        this.$apollo.queries.userData.refetch();
+
+        ///SET THE DATA OF THE EXPERIENCE
+        this.profiles(data.user.profiles.data[0]);
+        this.user(data.user);
         return data;
       },
       // Polling interval in milliseconds

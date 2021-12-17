@@ -1,69 +1,82 @@
 <template>
   <div>
-    <div class="text-xs-center">
-      <v-card>
-        <div>
-          <image-uploader
-            :preview="false"
-            :className="['fileinput', { 'fileinput--loaded': hasImage }]"
-            capture="environment"
-            :debug="1"
-            doNotResize="gif"
-            :autoRotate="true"
-            outputFormat="verbose"
-            @input="setImage"
-          >
-            <label for="fileInput" slot="upload-label">
-              <v-card>
-                <v-card-text v-if="hasImage" class="py-2 text-center">
-                  Replace
-                </v-card-text>
-                <v-card-text v-if="hasImage == false" class="py-2  text-center">
-                  Click to upload your profile image
-                </v-card-text>
-              </v-card>
-            </label>
-          </image-uploader>
-        </div>
-      </v-card>
-    </div>
+    <h1>Upload your photo profile</h1>
+    <br /><br />
+    <picture-input
+      ref="pictureInput"
+      @change="onChange"
+      width="150"
+      height="150"
+      margin="16"
+      accept="image/jpeg,image/png"
+      size="10"
+      :removable="true"
+      :customStrings="{
+        upload: '<h1>Bummer!</h1>',
+        drag: 'Drag Or Click to upload',
+      }"
+    >
+    </picture-input>
   </div>
 </template>
 
 <script>
-import ImageUploader from "vue-image-upload-resize";
+import PictureInput from "vue-picture-input";
+import { mapActions } from "vuex";
 export default {
-  components: {
-    ImageUploader,
-  },
+  name: "app",
   data() {
-    return {
-      hasImage: false,
-      image: null,
-    };
+    return {};
+  },
+  components: {
+    PictureInput,
   },
   methods: {
-    setImage: function(file) {
-      this.hasImage = true;
-      this.image = file;
-
-      let photoOb = {
-        file_name: this.image.info.name,
-        type: "PHOTO",
-        thumbnail: true,
-        path: this.image.dataUrl,
-      };
+    ...mapActions({
+      profilePhoto: "Attachment/getProfilephoto",
+    }),
+    onChange() {
       // eslint-disable-next-line no-console
-      this.$emit("uploadProfile", photoOb);
-      // eslint-disable-next-line no-console
-      console.log(this.image);
+      console.log("New picture selected!");
+      if (this.$refs.pictureInput.image) {
+        this.profilePhoto(this.$refs.pictureInput.image);
+        // eslint-disable-next-line no-console
+        console.log(this.$refs.pictureInput.image);
+      } else {
+        // eslint-disable-next-line no-console
+        console.log("FileReader API not supported: use the <form>, Luke!");
+      }
     },
   },
 };
 </script>
 
 <style>
-#fileInput {
-  /* font-size: 0px; */
+#app {
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
+
+h1,
+h2 {
+  font-weight: normal;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  display: inline-block;
+  margin: 0 10px;
+}
+
+a {
+  color: #42b983;
 }
 </style>

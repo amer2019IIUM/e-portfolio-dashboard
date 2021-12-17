@@ -7,6 +7,7 @@ query {
     facebook
     github
     phone_no
+    dribbble
     profiles {
       data {
         id
@@ -85,6 +86,21 @@ query {
         hidden_portfolio
       }
     }
+
+    profiles {
+      data {
+        id
+        first_name
+        last_name
+        lang
+        country
+        city
+        nationality
+        headline
+        summary
+      }
+    }
+
     skills {
       data {
         id
