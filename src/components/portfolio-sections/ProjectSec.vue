@@ -202,12 +202,7 @@ export default {
       dialogDelete: false,
       skillTypes: ["", "Techical", "Professional"],
       headers: [
-        // {
-        //   text: "ID",
-        //   align: "start",
-        //   sortable: false,
-        //   value: "id",
-        // },
+
         {
           text: "Project Title",
           align: "start",

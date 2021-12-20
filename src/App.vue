@@ -17,6 +17,7 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import UserData from "./graphql/queries/UserData.gql";
+import CurrentUser from "./graphql/queries/CurrentUser.gql";
 import { mapActions } from "vuex";
 
 export default {
@@ -47,7 +48,6 @@ export default {
 
       update(data) {
         //eslint-disable-next-line
-        // console.log(data.user.projects.data);
         ///SET THE DATA OF THE PROJECT
         this.projects(data.user.projects.data);
 
@@ -66,6 +66,18 @@ export default {
         ///SET THE DATA OF THE EXPERIENCE
         this.profiles(data.user.profiles.data[0]);
         this.user(data.user);
+        return data;
+      },
+      // Polling interval in milliseconds
+      // pollInterval: 10000,
+    },
+    currentUser: {
+      query: CurrentUser,
+      loadingKey: "loadingKey",
+
+      update(data) {
+        // eslint-disable-next-line no-console
+        console.log(data.currentUser);
         return data;
       },
       // Polling interval in milliseconds

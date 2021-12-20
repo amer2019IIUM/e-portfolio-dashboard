@@ -4,14 +4,14 @@ import Dashboard from '../views/Dashboard.vue'
 import Portfolios from '../views/Portfolios.vue'
 import Users from '../views/Users.vue'
 import CreatePortfolio from '../views/pages/CreatePortfolio.vue'
-
+import AuthenticationPage from '../views/pages/AuthenticationPage.vue'
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
     name: 'dashboard',
-    component: Dashboard
+    component: Dashboard,
   },
   {
     path: '/portfolios',
@@ -31,6 +31,11 @@ const routes = [
     path: '/create-portfolio',
     name: 'create-portfolio',
     component: CreatePortfolio
+  },
+  {
+    path: '/auth',
+    name: 'authentication-page',
+    component: AuthenticationPage
   }
 ]
 
