@@ -1,0 +1,25 @@
+mutation(
+  $email: String!
+  $password: String!
+  $phone_no: String!
+  $linkedin: String
+  $twitter: String
+  $facebook: String
+  $github: String
+  $dribbble: String
+) {
+  createUser(
+    input: {
+      email: $email
+      password: $password
+      phone_no: $phone_no
+      linkedin: $linkedin
+      twitter: $twitter
+      facebook: $facebook
+      github: $github
+      dribbble: $dribbble
+    }
+  ) {
+    id
+  }
+}
