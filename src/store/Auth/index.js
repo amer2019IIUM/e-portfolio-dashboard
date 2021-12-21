@@ -7,7 +7,7 @@ const state = {
 
 const getters = {
     authenticatedUserId: state => state.authenticatedUserId,
-    authStatus: state => !!state.user,
+    authStatus: state => state.authStatus,
 };
 
 const actions = {
@@ -16,10 +16,16 @@ const actions = {
         await localStorage.setItem('apollo-token', "Bearer " + token)
         window.location.reload()
     },
-    async currentUser({ commit }, userDetails) {
-        await commit('CURRENT_USER', userDetails);
-        await localStorage.setItem('user', !!userDetails)
+    async currentUser({ commit }, userData) {
+        await commit('CURRENT_USER', userData);
+        if (userData) {
+            commit('IS_AUTH');
+            await localStorage.setItem('authStatus', true)
+        }
+        else {
+            await localStorage.setItem('authStatus', false)
 
+        }
     },
 
     logout({ commit }) {
@@ -28,22 +34,23 @@ const actions = {
         sessionStorage.clear()
         localStorage.setItem('user', false)
         window.location.reload()
-
     }
 };
 const mutations = {
     CURRENT_USER(state, payload) {
-        state.user = payload
-        state.authStatus = true;
-        // console.log(state.user)
+        state.authenticatedUserId = payload;
     },
+    IS_AUTH(state,) {
+        state.authStatus = true
+    },
+
     LOGIN(state, payload) {
         state.token = payload;
     },
 
     LOGOUT(state) {
         state.user = {};
-        state.authStatus = false;
+        state.authenticatedUserId = null;
         state.token = null;
     }
 };

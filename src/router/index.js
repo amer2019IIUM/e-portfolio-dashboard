@@ -7,30 +7,39 @@ import CreatePortfolio from '../views/pages/CreatePortfolio.vue'
 import AuthenticationPage from '../views/pages/AuthenticationPage.vue'
 Vue.use(VueRouter)
 
+
 const routes = [
   {
     path: '/',
     name: 'dashboard',
     component: Dashboard,
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: '/portfolios',
     name: 'portfolios',
-    component: Portfolios
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    //component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    component: Portfolios,
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: '/users',
     name: 'users',
-    component: Users
+    component: Users,
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: '/create-portfolio',
     name: 'create-portfolio',
-    component: CreatePortfolio
+    component: CreatePortfolio,
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: '/auth',
@@ -41,8 +50,23 @@ const routes = [
 
 const router = new VueRouter({
   mode: 'history',
-  base: process.env.BASE_URL,
+  // base: process.env.BASE_URL,
   routes
 })
 
+
+////Authentication Route validations
+router.beforeEach((to, from, next) => {
+  let isAuth = localStorage.getItem("authStatus");
+  // eslint-disable-next-line no-console
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (isAuth == "true") {
+      next();
+    }
+    else {
+      next({ path: '/auth' });
+    }
+  }
+  next();
+})
 export default router

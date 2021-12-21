@@ -8,7 +8,7 @@ import store from './store'
 import VueStepWizard from 'vue-step-wizard'
 import 'vue-step-wizard/dist/vue-step-wizard.css'
 Vue.use(VueStepWizard);
-Vue.config.productionTip = false
+// Vue.config.productionTip = false
 
 import { createProvider } from './vue-apollo'
 // Vue.use(ImageUploader);

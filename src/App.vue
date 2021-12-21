@@ -1,13 +1,11 @@
 <template>
-  <v-app>
-    <Navbar />
+  <v-app v-if="loadingKey">
+    loading....
+  </v-app>
+  <v-app v-else>
+    <Navbar v-if="stopNavbar == false" />
     <v-content>
-      <div v-if="loadingKey">
-        WAITING
-      </div>
-      <div v-else>
-        <router-view> </router-view>
-      </div>
+      <router-view></router-view>
     </v-content>
     <Footer />
   </v-app>
@@ -22,12 +20,14 @@ import { mapActions } from "vuex";
 
 export default {
   name: "App",
+
   components: {
     Navbar,
     Footer,
   },
   data: () => ({
     //
+    stopNavbar: true,
     loadingKey: 0,
   }),
   methods: {
@@ -39,6 +39,7 @@ export default {
       experiences: "Portfolio/getExperienceData",
       profiles: "Portfolio/getProfileData",
       user: "Portfolio/getUserData",
+      setAuth: "Auth/currentUser",
     }),
   },
   apollo: {
@@ -77,7 +78,25 @@ export default {
 
       update(data) {
         // eslint-disable-next-line no-console
-        console.log(data.currentUser);
+        if (data.currentUser == null) {
+          this.setAuth(null)
+            .then(() => {
+              this.stopNavbar = false;
+            })
+            .catch((e) => {
+              // eslint-disable-next-line no-console
+              console.log(e);
+            });
+        } else {
+          this.setAuth(data.currentUser.id)
+            .then(() => {
+              this.stopNavbar = false;
+            })
+            .catch((e) => {
+              // eslint-disable-next-line no-console
+              console.log(e);
+            });
+        }
         return data;
       },
       // Polling interval in milliseconds

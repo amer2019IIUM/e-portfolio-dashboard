@@ -69,6 +69,9 @@ export default {
           })
           .then((data) => {
             this.login(data.data.login.access_token);
+            this.$router.go();
+
+            // window.location.reload().then(() => {});
           })
           .catch((errors) => {
             //eslint-disable-next-line no-console

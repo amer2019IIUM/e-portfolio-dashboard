@@ -33,15 +33,31 @@
 <script>
 import LoginComp from "../../components/authComponenets/LoginComp.vue";
 import RegisterComp from "../../components/authComponenets/RegisterComp.vue";
-
+import { mapGetters } from "vuex";
 export default {
   components: { LoginComp, RegisterComp },
   computed: {
+    ...mapGetters({
+      currentUser: "Auth/authenticatedUserId",
+    }),
     passwordMatch() {
       return () => this.password === this.verify || "Password must match";
     },
   },
+  created() {
+    this.checkAuth();
+  },
   methods: {
+    checkAuth() {
+      if (this.currentUser == null) {
+        return;
+      } else {
+        this.$router
+          .push({ path: "/" })
+          .then(() => {})
+          .catch(() => {});
+      }
+    },
     validate() {
       if (this.$refs.loginForm.validate()) {
         // submit form to server/API here...
@@ -54,6 +70,27 @@ export default {
       this.$refs.form.resetValidation();
     },
   },
+
+  // beforeRouteEnter(to, from, next) {
+  //   let isAuth = true;
+  //   // eslint-disable-next-line no-console
+  //   if (to.matched.some((record) => record.meta.public)) {
+  //     // this route requires auth, check if logged in
+  //     // if not, redirect to login page.
+  //     if (!isAuth) {
+  //       next({
+  //         path: "/auth",
+  //         query: { redirect: to.fullPath },
+  //       });
+  //     } else {
+  //       next({
+  //         path: "/auth",
+  //       });
+  //     }
+  //   } else {
+  //     next(); // make sure to always call next()!
+  //   }
+  // },
   data: () => ({
     dialog: true,
     tab: 0,

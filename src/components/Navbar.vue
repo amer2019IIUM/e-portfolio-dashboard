@@ -1,14 +1,17 @@
 <template>
   <nav>
     <v-app-bar color="primaryBackgroundColor" dark app>
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon
+        @click.stop="drawer = !drawer"
+        v-if="isAuth == true"
+      ></v-app-bar-nav-icon>
       <v-toolbar-title class="text-uppercase">
         <span>LOGO</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-menu offset-y>
         <template v-slot:activator="{ on }">
-          <v-btn text v-on="on">
+          <v-btn text v-on="on" v-if="isAuth == true">
             <v-icon left>expand_more</v-icon>
             <span>Menu</span>
           </v-btn>
@@ -25,12 +28,17 @@
           </v-list-item>
         </v-list>
       </v-menu>
-      <v-btn text>
+      <v-btn text v-if="isAuth == false">
+        <span>LOGIN</span>
+        <!-- <v-icon right>enter_to_app</v-icon> -->
+      </v-btn>
+      <v-btn text v-if="isAuth == true">
         <span>Exit</span>
         <v-icon right>exit_to_app</v-icon>
       </v-btn>
     </v-app-bar>
     <v-navigation-drawer
+      v-if="isAuth == true"
       v-model="drawer"
       dark
       app
@@ -71,6 +79,8 @@
   </nav>
 </template>
 <script>
+import { mapGetters } from "vuex";
+
 export default {
   data: () => ({
     drawer: true,
@@ -81,6 +91,12 @@ export default {
     ],
   }),
   components: {},
+
+  computed: {
+    ...mapGetters({
+      isAuth: "Auth/authStatus",
+    }),
+  },
 };
 </script>
 <style scoped>
