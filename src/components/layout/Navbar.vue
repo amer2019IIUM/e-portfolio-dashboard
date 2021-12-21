@@ -97,7 +97,7 @@
   </nav>
 </template>
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   data: () => ({
@@ -111,9 +111,19 @@ export default {
   }),
   components: {},
   methods: {
+    ...mapActions({
+      userLogout: "Auth/logout",
+    }),
     logout() {
-      // eslint-disable-next-line no-console
-      console.log("logout");
+      this.userLogout()
+        .then(() => {
+          // eslint-disable-next-line no-console
+          console.log("Logout");
+        })
+        .catch((e) => {
+          // eslint-disable-next-line no-console
+          console.log(e);
+        });
     },
   },
   computed: {

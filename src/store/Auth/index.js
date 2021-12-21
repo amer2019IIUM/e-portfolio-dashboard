@@ -28,11 +28,11 @@ const actions = {
         }
     },
 
-    logout({ commit }) {
+    async logout({ commit }) {
         commit('LOGOUT');
         localStorage.clear()
         sessionStorage.clear()
-        localStorage.setItem('user', false)
+        localStorage.setItem('authStatus', false)
         window.location.reload()
     }
 };
@@ -49,9 +49,8 @@ const mutations = {
     },
 
     LOGOUT(state) {
-        state.user = {};
+        state.authStatus = false;
         state.authenticatedUserId = null;
-        state.token = null;
     }
 };
 
