@@ -12,8 +12,8 @@
 </template>
 
 <script>
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import Navbar from "./components/layout/Navbar";
+import Footer from "./components/layout/Footer";
 import UserData from "./graphql/queries/UserData.gql";
 import CurrentUser from "./graphql/queries/CurrentUser.gql";
 import { mapActions } from "vuex";

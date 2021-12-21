@@ -32,8 +32,8 @@
         <span>LOGIN</span>
         <!-- <v-icon right>enter_to_app</v-icon> -->
       </v-btn>
-      <v-btn text v-if="isAuth == true">
-        <span>Exit</span>
+      <v-btn text @click="logout" v-if="isAuth == true">
+        <span>Logout</span>
         <v-icon right>exit_to_app</v-icon>
       </v-btn>
     </v-app-bar>
@@ -53,19 +53,37 @@
         </v-flex>
         <v-flex class="mt-4 mb-4">
           <router-link to="create-portfolio" style="text-decoration: none;">
-            <v-btn outlined color="teal lighten-3" dark>
-              Add new project
+            <v-btn outlined color="teal lighten-3" dark v-if="hasProfile">
+              Update Portfolio
+            </v-btn>
+            <v-btn
+              outlined
+              color="teal lighten-3"
+              dark
+              v-if="hasProfile == null"
+            >
+              Add new portfolio
             </v-btn>
           </router-link>
         </v-flex>
       </v-layout>
-      <v-list flat>
+      <v-list flat v-for="link in links" :key="link.text" router>
         <v-list-item
-          v-for="link in links"
-          :key="link.text"
-          router
           :to="link.route"
           active-class="border"
+          v-if="link.text != 'Logout'"
+        >
+          <v-list-item-action>
+            <v-icon>{{ link.icon }}</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>{{ link.text }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item
+          @click="logout"
+          active-class="border"
+          v-if="link.text == 'Logout'"
         >
           <v-list-item-action>
             <v-icon>{{ link.icon }}</v-icon>
@@ -88,13 +106,20 @@ export default {
       { icon: "dashboard", text: "Dashboard", route: "/" },
       { icon: "folder", text: "My portfolios", route: "/portfolios" },
       { icon: "person", text: "Users", route: "/users" },
+      { icon: "exit_to_app", text: "Logout", route: "/" },
     ],
   }),
   components: {},
-
+  methods: {
+    logout() {
+      // eslint-disable-next-line no-console
+      console.log("logout");
+    },
+  },
   computed: {
     ...mapGetters({
       isAuth: "Auth/authStatus",
+      hasProfile: "Portfolio/profileSecData",
     }),
   },
 };

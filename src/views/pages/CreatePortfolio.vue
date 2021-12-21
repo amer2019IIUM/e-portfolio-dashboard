@@ -105,7 +105,7 @@ import { required } from "vuelidate/lib/validators";
 import { email } from "vuelidate/lib/validators";
 import { mapGetters } from "vuex";
 // import { numeric } from "vuelidate/lib/validators";
-import ImageUpload from "../../components/ImageUpload.vue";
+import ImageUpload from "../../components/helper components/ImageUpload.vue";
 import ExperienceSec from "../../components/portfolio-sections/ExperienceSec.vue";
 import SkillSec from "../../components/portfolio-sections/SkillSec.vue";
 import EducationSec from "../../components/portfolio-sections/EducationSec.vue";

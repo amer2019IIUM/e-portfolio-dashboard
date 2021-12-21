@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Dashboard from '../views/Dashboard.vue'
-import Portfolios from '../views/Portfolios.vue'
-import Users from '../views/Users.vue'
+import Dashboard from '../views/pages/Dashboard.vue'
+import Portfolios from '../views/pages/Portfolios.vue'
+import Users from '../views/pages/Users.vue'
 import CreatePortfolio from '../views/pages/CreatePortfolio.vue'
 import AuthenticationPage from '../views/pages/AuthenticationPage.vue'
 Vue.use(VueRouter)
